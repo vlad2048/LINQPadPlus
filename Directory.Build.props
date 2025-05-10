@@ -9,7 +9,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>vlad2048</Authors>
     <Description>LINQPad utilities to run JavaScript, render dynamic HTML, plotting and more</Description>
-    <PackageTags>LINQPad,JavaScript,HTML,plotting</PackageTags>
+    <PackageTags>LINQPad,linqpad-samples,JavaScript,HTML,plotting</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup>

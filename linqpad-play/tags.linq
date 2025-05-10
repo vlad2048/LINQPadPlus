@@ -4,7 +4,7 @@
   <Namespace>LINQPadPlus.Rx</Namespace>
 </Query>
 
-#load "..\lib"
+#load "lib"
 
 
 void Main()

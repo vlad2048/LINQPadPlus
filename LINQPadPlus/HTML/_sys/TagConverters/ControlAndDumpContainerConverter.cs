@@ -24,11 +24,15 @@ static class ControlAndDumpContainerConverter
 		JS.Run(
 			"""
 			(async () => {
-				const [eltDad, eltKid] = await Promise.all([
-					window.waitForElement(____0____),
-					window.waitForElement(____1____),
-				]);
-				eltDad.appendChild(eltKid);
+				try {
+					const [eltDad, eltKid] = await Promise.all([
+						window.waitForElement(____0____),
+						window.waitForElement(____1____),
+					]);
+					eltDad.appendChild(eltKid);
+				} catch (err) {
+					dispatchError(err, runId);
+				}
 			})();
 			""",
 			e => e

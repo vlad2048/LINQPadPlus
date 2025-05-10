@@ -16,22 +16,28 @@ public static partial class JS
 		[CallerLineNumber] int srcLine = 0
 	)
 	{
+		var runId = CtxMap.GetNewRunId();
 		code = Fmt(code, replFun);
+		// @formatter:off
 		var codeFull = $$"""
 			try {
-
+				const runId = {{runId}};
+			
 				{{code.JSIndent(1)}}
 
 			} catch (err) {
 				({
 					id: '{{JSRunIdentifiers.RuntimeErrorIdentifier}}',
+					run_id: runId,
 					message: err.message,
 					stack: err.stack,
 				});
 			}
 			""";
+		// @formatter:on
 
-		var ctx = new CSErrorCtx(true, code, codeFull, new CSharpSourceLocation(srcMember, srcFile, srcLine));
+		var ctx = new CSErrorCtx(true, code, codeFull, new CSharpSourceLocation(srcMember, srcFile, srcLine), DateTime.Now);
+		CtxMap.KeepTrackOfCtx(runId, ctx);
 		return JSRunLogic.Return(ctx);
 	}
 }

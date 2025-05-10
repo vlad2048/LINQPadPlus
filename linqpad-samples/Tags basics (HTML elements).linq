@@ -1,9 +1,9 @@
 <Query Kind="Program">
+  <NuGetReference>LINQPadPlus</NuGetReference>
   <Namespace>LINQPadPlus</Namespace>
 </Query>
 
-#load ".\lib"
-//void OnStart() => LINQPadPlusSetup.Init();	// Always initialize the library in OnStart()
+void OnStart() => LINQPadPlusSetup.Init();
 
 
 void Main()

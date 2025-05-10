@@ -1,11 +1,13 @@
 ﻿using LINQPad;
+using LINQPadPlus._sys;
 
 namespace LINQPadPlus;
 
 public static partial class JS
 {
-	internal static void Init() =>
-		Util.InvokeScript(false, "eval", JS.Fmt(
+	internal static void Init()
+	{
+		Util.InvokeScript(false, "eval", Fmt(
 			"""
 
 			// ***********
@@ -28,6 +30,15 @@ public static partial class JS
 				log('Code');
 				log('----');
 				log(code);
+			}
+			
+			function dispatchError(err, runId) {
+				dispatch(____0____, {
+					id: ____1____,
+					run_id: runId,
+					message: err.message,
+					stack: err.stack,
+				});
 			}
 
 
@@ -89,6 +100,10 @@ public static partial class JS
 				timerIds.push(intervalId);
 			}
 
-			"""
+			""",
+			e => e
+				.JSRepl_Val(0, Events.ErrorDispatcherId)
+				.JSRepl_Val(1, JSRunIdentifiers.RuntimeErrorIdentifier)
 		));
+	}
 }

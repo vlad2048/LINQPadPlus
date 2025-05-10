@@ -4,5 +4,6 @@ sealed record CSErrorCtx(
 	bool IsReturn,
 	string Code,
 	string CodeFull,
-	CSharpSourceLocation CSharpSourceLocation
+	CSharpSourceLocation CSharpSourceLocation,
+	DateTime TimeCreated
 );

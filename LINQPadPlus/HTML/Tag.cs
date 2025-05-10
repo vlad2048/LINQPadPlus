@@ -169,8 +169,12 @@ public static class TagUtils
 		JS.Run(
 			"""
 			(async () => {
-				const elt = await window.waitForElement(____998____);
-				(____999____)(elt);
+				try {
+					const elt = await window.waitForElement(____998____);
+					(____999____)(elt);
+				} catch (err) {
+					dispatchError(err, runId);
+				}
 			})();
 			""",
 			e =>
@@ -187,26 +191,6 @@ public static class TagUtils
 			// ReSharper restore ExplicitCallerInfoArgument
 		);
 }
-
-/*
-static class TagFileUtils
-{
-	public static string JSRepl_Val<T>(this string c, int i, T x)
-	{
-		if (typeof(T) == typeof(string))
-			return c.JSRepl_Val(i, x as string);
-		if (typeof(T) == typeof(bool))
-			return c.JSRepl_Val(i, (bool)(x as object)!);
-		if (typeof(T) == typeof(double))
-			return c.JSRepl_Val(i, (double)(x as object)!);
-		if (typeof(T) == typeof(int))
-			return c.JSRepl_Val(i, (int)(x as object)!);
-		throw new ArgumentException($"TagFileUtils.JSRepl_Val<T> does not support type: {typeof(T).Name}");
-	}
-}
-*/
-
-
 
 
 

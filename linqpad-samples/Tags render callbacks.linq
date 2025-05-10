@@ -1,12 +1,12 @@
 <Query Kind="Program">
+  <NuGetReference>LINQPadPlus</NuGetReference>
   <Namespace>LINQPadPlus</Namespace>
 </Query>
 
-#load ".\lib"
-
 void OnStart()
 {
-	// LINQPadPlusSetup.Init();	// Always initialize the library in OnStart()
+	LINQPadPlusSetup.Init();	// Always initialize the library in OnStart()
+	
 	// Import LeaderLine and apply some CSS
 	Util.HtmlHead.AddScriptFromUri("https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.3/leader-line.min.js");
 	Util.HtmlHead.AddStyles("""

@@ -1,13 +1,16 @@
 ﻿using LINQPad;
 using LINQPad.Controls;
+using LINQPadPlus._sys;
 
 namespace LINQPadPlus;
 
-static class Events
+public static class Events
 {
 	const string DispatcherDivId = "dispatcher";
 	static Div? dispatcherDiv;
 	static Div DispatcherDiv => dispatcherDiv ?? throw new ArgumentException("Events.Init() was not called");
+
+	public const string ErrorDispatcherId = nameof(ErrorDispatcherId);
 
 	internal static void Init()
 	{
@@ -27,7 +30,31 @@ static class Events
 			e => e
 				.JSRepl_Var(0, DispatcherDivId)
 		);
+		
+		ListenWithArguments(ErrorDispatcherId, JSRunLogic.ErrorReceived);
 	}
+	
+	
+	/// <summary>
+	/// Warning
+	/// Much slower than Listen() for some reason
+	/// </summary>
+	static void ListenWithArguments(string dispatchId, Action<string> action)
+	{
+		static string ReadProp(PropertyEventArgs args)
+		{
+			if (!args.Properties.TryGetValue("detail", out var str)) throw new ArgumentException("(Impossible) Detail property not found in custom event");
+			return str;
+		}
+		
+		DispatcherDiv.HtmlElement.AddEventListener(dispatchId, ["detail"], (_, e) =>
+		{
+			action(ReadProp(e));
+		});
+		Thread.Sleep(10);
+	}
+
+
 
 	public static void Listen(string dispatchId, Action action)
 	{
