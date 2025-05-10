@@ -40,4 +40,6 @@ static class Tables
 }
 
 
-static T[] Load<T>(string name) => JsonSerializer.Deserialize<T[]>(File.ReadAllText(Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath)!, name)))!;
+static readonly string samplesFolder = Path.Combine(Path.GetDirectoryName(typeof(LINQPadPlusSetup).Assembly.Location)!, "..", "..", "linqpad-samples");
+
+static T[] Load<T>(string name) => JsonSerializer.Deserialize<T[]>(File.ReadAllText(Path.Combine(samplesFolder, name)))!;
