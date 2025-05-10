@@ -1,5 +1,5 @@
 nuget setapikey ______________________________________________ -Source https://api.nuget.org/v3/index.json
-set ver=0.0.1
+set ver=0.0.2
 set slnFolder=D:\dev\big\LINQPadPlus
 set nugetFolder=C:\Users\admin\.nuget\packages
 set nugetUrl=https://api.nuget.org/v3/index.json

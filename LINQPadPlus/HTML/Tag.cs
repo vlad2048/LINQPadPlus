@@ -1,6 +1,4 @@
-﻿using System.Reactive.Subjects;
-using System.Reactive;
-using System.Text;
+﻿using System.Text;
 using LINQPad;
 using LINQPadPlus._sys;
 using LINQPadPlus._sys.Utils;
@@ -23,11 +21,12 @@ public class Tag
 	readonly ISig sigPreRender = new Sig();
 	readonly ISig sigPostRender = new SigAsync();
 
-	public string Id { get; } = IdGen.Make();
+	public string Id { get; }
 
-	internal Tag(string name)
+	public Tag(string name, string? id = null)
 	{
 		this.name = name;
+		Id = id ?? IdGen.Make();
 
 		var readyDispatchId = $"{Id}-OnReady";
 		sigPreRender.Subscribe(_ => Events.Listen(readyDispatchId, sigPostRender.Trig));
@@ -67,12 +66,19 @@ public class Tag
 	public Tag this[params HtmlNode[] kids_]							=> this.With(() => kids.AddRange(kids_));
 	public Tag cls(string className, bool condition = true)				=> this.With(() => classes.Add(className), condition);
 	public Tag style(string style, bool condition = true)				=> this.With(() => styles.Add(style), condition);
-	public Tag style(string[] styles_, bool condition = true)			=> this.With(() => styles.AddRange(styles_), condition);
 	public Tag attr(string key, JSVal? value, bool condition = true)	=> this.With(() => attrs[key] = value, condition);
-	public Tag js(string onRender)										=> this.With(() => sigPostRender.Subscribe(_ => this.Run(onRender)));
 	// @formatter:on
 
 
+	public Tag js(
+		string onRender,
+		[CallerMemberName] string? srcMember = null,
+		[CallerFilePath] string? srcFile = null,
+		[CallerLineNumber] int srcLine = 0
+	) =>
+	// ReSharper disable ExplicitCallerInfoArgument
+		this.With(() => sigPostRender.Subscribe(_ => this.Run(onRender, null, srcMember, srcFile, srcLine)));
+	// ReSharper restore ExplicitCallerInfoArgument
 
 
 	public Tag enable(RoVar<bool> Δon) => AddMutator(Mutator.Make(
@@ -211,9 +217,17 @@ file static class TagWriter
 	public static void WriteStyles(this StringBuilder sb, List<string> styles)
 	{
 		if (styles.Count == 0) return;
-		sb.Append($" style='{styles.JoinText("; ")}'");
+		var stylesStr = styles.Select(e => e.Trim().RemoveSuffixIFN(";")).JoinText("; ");
+		sb.Append($" style='{stylesStr}'");
 	}
 	public static void WriteTagOpenEnd(this StringBuilder sb) => sb.Append(">");
 
 	public static void WriteTagClose(this StringBuilder sb, string name) => sb.Append($"</{name}>");
+
+	static string RemoveSuffixIFN(this string s, string suffix) =>
+		s.EndsWith(suffix) switch
+		{
+			true => s[..^suffix.Length],
+			false => s,
+		};
 }

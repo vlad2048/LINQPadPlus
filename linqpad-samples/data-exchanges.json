@@ -1,0 +1,104 @@
+[
+	{
+		"Name": "XMAD",
+		"InstitutionName": "BOLSA DE MADRID",
+		"City": "MADRID",
+		"Website": "WWW.BOLSAMADRID.ES"
+	},
+	{
+		"Name": "XAMS",
+		"InstitutionName": "EURONEXT - EURONEXT AMSTERDAM",
+		"City": "AMSTERDAM",
+		"Website": "WWW.EURONEXT.COM"
+	},
+	{
+		"Name": "XBRU",
+		"InstitutionName": "EURONEXT - EURONEXT BRUSSELS",
+		"City": "BRUSSELS",
+		"Website": "WWW.EURONEXT.COM"
+	},
+	{
+		"Name": "XETR",
+		"InstitutionName": "XETRA",
+		"City": "FRANKFURT",
+		"Website": "WWW.DEUTSCHE-BOERSE.COM"
+	},
+	{
+		"Name": "XLIS",
+		"InstitutionName": "EURONEXT - EURONEXT LISBON",
+		"City": "LISBON",
+		"Website": "WWW.EURONEXT.COM"
+	},
+	{
+		"Name": "XLON",
+		"InstitutionName": "LONDON STOCK EXCHANGE",
+		"City": "LONDON",
+		"Website": "WWW.LONDONSTOCKEXCHANGE.COM"
+	},
+	{
+		"Name": "AIMX",
+		"InstitutionName": "LONDON STOCK EXCHANGE - AIM MTF",
+		"City": "LONDON",
+		"Website": "WWW.LONDONSTOCKEXCHANGE.COM"
+	},
+	{
+		"Name": "XMUN",
+		"InstitutionName": "BOERSE MUENCHEN",
+		"City": "MUENCHEN",
+		"Website": "WWW.BOERSE-MUENCHEN.DE"
+	},
+	{
+		"Name": "XNCM",
+		"InstitutionName": "NASDAQ CAPITAL MARKET",
+		"City": "NEW YORK",
+		"Website": "WWW.NASDAQ.COM"
+	},
+	{
+		"Name": "XNGS",
+		"InstitutionName": "NASDAQ/NGS (GLOBAL SELECT MARKET)",
+		"City": "NEW YORK",
+		"Website": "WWW.NASDAQ.COM"
+	},
+	{
+		"Name": "XNMS",
+		"InstitutionName": "NASDAQ/NMS (GLOBAL MARKET)",
+		"City": "NEW YORK",
+		"Website": "WWW.NASDAQ.COM"
+	},
+	{
+		"Name": "XNYS",
+		"InstitutionName": "NEW YORK STOCK EXCHANGE, INC.",
+		"City": "NEW YORK",
+		"Website": "WWW.NYSE.COM"
+	},
+	{
+		"Name": "XASE",
+		"InstitutionName": "NYSE AMERICAN LLC",
+		"City": "NEW YORK",
+		"Website": "WWW.NYSE.COM"
+	},
+	{
+		"Name": "XPAR",
+		"InstitutionName": "EURONEXT - EURONEXT PARIS",
+		"City": "PARIS",
+		"Website": "WWW.EURONEXT.COM"
+	},
+	{
+		"Name": "XSWX",
+		"InstitutionName": "SIX SWISS EXCHANGE",
+		"City": "ZURICH",
+		"Website": "WWW.SIX-GROUP.COM/EN/SITE/EXCHANGES.HTML"
+	},
+	{
+		"Name": "XTSE",
+		"InstitutionName": "TORONTO STOCK EXCHANGE",
+		"City": "TORONTO",
+		"Website": "WWW.TSE.COM"
+	},
+	{
+		"Name": "XWBO",
+		"InstitutionName": "WIENER BOERSE AG",
+		"City": "VIENNA",
+		"Website": "WWW.WIENERBOERSE.AT"
+	}
+]

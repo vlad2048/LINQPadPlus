@@ -10,14 +10,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Controls\Table\_sys\tabulator.min.js" />
+    <None Remove="Controls\Table\_sys\tabulator_site_dark.min.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <Content Include="..\linqpad-samples\">
+    <Content Include="..\linqpad-samples">
       <Pack>true</Pack>
       <PackagePath>linqpad-samples</PackagePath>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\Table\_sys\tabulator.min.js" />
+    <EmbeddedResource Include="Controls\Table\_sys\tabulator_site_dark.min.css" />
   </ItemGroup>
 
   <ItemGroup>
