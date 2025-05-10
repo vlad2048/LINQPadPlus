@@ -38,7 +38,10 @@ If you write incorrect code these will show you exactly what the issue is:
 JS.Run("extern al.log('Hello')");
 ```
 ![dataframes](.assets/js-error.png)
-It will catch and display:
+
+Notice that your code is wrapped in some boilerplate to catch the errors.
+
+It handles:
 - compilation errors
 - runtime errors
 - runtime errors in async code
