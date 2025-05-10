@@ -20,7 +20,10 @@ sealed record JSRuntimeError(string Id, string RunId, string Message, string Sta
 
 void Main()
 {
-	JS.Run("""
+	JS.Run("extern al.log('Hello')");
+	var str = JS.Return("'abc'").p();
+
+	/*JS.Run("""
 	(async function() {
 		try {
 			external.log('abtc');
@@ -30,7 +33,7 @@ void Main()
 			dispatchError(err, runId);
 		}
 	})()
-	""");
+	""");*/
 }
 
 
