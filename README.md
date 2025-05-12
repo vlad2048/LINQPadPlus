@@ -67,14 +67,3 @@ t.Label[
     new DumpContainer("content")            // support LINQPad DumpContainer
 ].Dump();
 ```
-
-### Add children
-Use the index operator as a fluent method:
-```c#
-public Tag this[params HtmlNode[] kids]
-```
-The children can be:
-- other tags
-- strings
-- LINQPad controls
-- LINQPad dump containers
