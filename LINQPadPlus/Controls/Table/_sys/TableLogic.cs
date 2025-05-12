@@ -238,7 +238,7 @@ static class TableLogic
 
 		var searchBarCtrls = opts.SearchFields
 			.Select((searchField, searchFieldIdx) =>
-				new Tag("input", SearchId(id, searchFieldIdx))
+				t.Input.id(SearchId(id, searchFieldIdx))
 					.attr("type", "text")
 					.attr("placeholder", searchField.Name)
 					.style("width: 100%")
@@ -248,7 +248,7 @@ static class TableLogic
 		searchBarCtrls = [..opts.ExtraCtrlsPrepend, ..searchBarCtrls, ..opts.ExtraCtrlsAppend];
 
 		if (displayRowCount)
-			searchBarCtrls = [new Tag("span", RowCountId(id)), ..searchBarCtrls];
+			searchBarCtrls = [t.Span.id(RowCountId(id)), ..searchBarCtrls];
 
 		var jsInitDisplayRowCount = displayRowCount switch
 		{
@@ -290,11 +290,11 @@ static class TableLogic
 		if (opts.Dbg_)
 			Util.SyntaxColorText(finalJS, SyntaxLanguageStyle.JavaScript).Dump();
 
-		var tag = new Tag("div")
+		var tag = t.Div
 			.cls(CtrlsClasses.TableWrapper)
 			.style($"width:{opts.Width}px; display:inline-block", opts.Width.HasValue)
 			[
-				new Tag("div")
+				t.Div
 					.cls(CtrlsClasses.HorzCtrlRow)
 					.cls(CtrlsClasses.TableControls)
 					[
@@ -302,7 +302,7 @@ static class TableLogic
 					]
 					.If(searchBarCtrls.Any()),
 
-				new Tag("div", id)
+				t.Div.id(id)
 					.js(finalJS)
 			];
 

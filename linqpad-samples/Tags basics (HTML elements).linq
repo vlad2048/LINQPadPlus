@@ -8,9 +8,9 @@ void OnStart() => LINQPadPlusSetup.Init();
 
 void Main()
 {
-	tag.Label[
+	t.Label[
 		"Checkbox",
-		tag.Input.attr("type", "checkbox")
+		t.Input.attr("type", "checkbox")
 	].Dump();
 }
 

@@ -8,8 +8,6 @@ namespace LINQPadPlus.Rx;
 /// </summary>
 public sealed class Disp : ICollection<IDisposable>, ICancelable
 {
-	const bool DisposeInReverseOrder = true;
-	
 	readonly object _gate = new();
 	bool _disposed;
 	List<IDisposable?> _disposables;
@@ -168,22 +166,9 @@ public sealed class Disp : ICollection<IDisposable>, ICancelable
 
 		if (currentDisposables != null)
 		{
-			if (DisposeInReverseOrder)
+			foreach (var d in Enumerable.Reverse(currentDisposables))
 			{
-				foreach (var d in Enumerable.Reverse(currentDisposables))
-				{
-					//var tname = d?.GetType().Name!;
-					//if (!tname.Contains("LiteSubject") && !tname.Contains("Anonymous"))
-					//	Console.WriteLine($"[{Name}].Dispose( {tname} )");
-					d?.Dispose();
-				}
-			}
-			else
-			{
-				foreach (var d in currentDisposables)
-				{
-					d?.Dispose();
-				}
+				d?.Dispose();
 			}
 		}
 	}
@@ -211,19 +196,9 @@ public sealed class Disp : ICollection<IDisposable>, ICancelable
 			Volatile.Write(ref _count, 0);
 		}
 
-		if (DisposeInReverseOrder)
+		foreach (var d in Enumerable.Reverse(previousDisposables))
 		{
-			foreach (var d in Enumerable.Reverse(previousDisposables))
-			{
-				d?.Dispose();
-			}
-		}
-		else
-		{
-			foreach (var d in previousDisposables)
-			{
-				d?.Dispose();
-			}
+			d?.Dispose();
 		}
 	}
 

@@ -76,8 +76,8 @@ public static class Events
 			{
 				var Δon = Var.Make(true);
 
-				var btn = tag.Button["Btn"].enable(Δon);
-				var btnToggle = tag.Button["toggle"].listen("click", () =>
+				var btn = t.Button["Btn"].enable(Δon);
+				var btnToggle = t.Button["toggle"].listen("click", () =>
 				{
 					Δon.V = !Δon.V;
 				});

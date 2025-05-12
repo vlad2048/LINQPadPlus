@@ -19,7 +19,7 @@ static class ControlAndDumpContainerConverter
 	{
 		kid.HtmlElement.ID = IdGen.Make();
 
-		var dad = tag.Div.onReady(() => kid.Dump());
+		var dad = t.Div.onReady(() => kid.Dump());
 
 		JS.Run(
 			"""

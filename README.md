@@ -49,10 +49,23 @@ It handles:
 
 ## Using Tags (HTML)
 
-### Creation
 ```c#
-new Tag("div", "myid").Dump();
-tags.Div.Dump()                     // if you don't need to override the Id
+t.Div.Dump()                                // create a div
+t.Div.id("myid")                            // set Id
+t.Div.cls("myclass")                        // set class (can be called multiple times)
+t.Div.style("font-size:12px; color:blue")   // set styles (can be called multiple times)
+t.Button.enable(false)                      // disabled button
+
+// add children
+public Tag this[params HtmlNode[] kids]
+
+t.Label[
+    t.Input                                 // other tag
+        .attr("type", "checkbox"),          // set attributes
+    "Checkbox",                             // text node
+    new LINQPad.Controls.Span("text"),      // support LINQPad controls
+    new DumpContainer("content")            // support LINQPad DumpContainer
+].Dump();
 ```
 
 ### Add children

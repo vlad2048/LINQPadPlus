@@ -39,13 +39,13 @@ void OnStart()
 void Main()
 {
 	// use Tag.onReady(Action) to execute some C# when the element appears in the DOM
-	tag.Span["Span"].onReady(() => "I am ready".Dump()).Dump();
+	t.Span["Span"].onReady(() => "I am ready".Dump()).Dump();
 
 	// use Tag.js(string) to execute some JavaScript when the element appears in the DOM
 	// in this case we draw some nice arrows between the 2 boxes
-	var main = tag.Div.cls("main")[[
-		tag.Div.cls("src"),
-		tag.Div.cls("dst"),
+	var main = t.Div.cls("main")[[
+		t.Div.cls("src"),
+		t.Div.cls("dst"),
 	]]
 	.js("elt => new LeaderLine(elt.childNodes[0], elt.childNodes[1], { size: 8, dash: {animation: true} } )")
 	.Dump();

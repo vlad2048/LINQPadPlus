@@ -18,7 +18,7 @@ void Main()
 	var ΔsymbolsInExchange = Δexchange.SelectVar(exchange => symbols.Where(e => e.Mic == exchange.Name).ToArray());
 	var (Δsymbol, symbolUI) = ΔsymbolsInExchange.ToTableSelector(Tables.Symbols);
 
-	tag.Div.style("display:flex; column-gap:20px")[[
+	t.Div.style("display:flex; column-gap:20px")[[
 		exchangeUI,
 		symbolUI,
 		Δsymbol.ToDC(),

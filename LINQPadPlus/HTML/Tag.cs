@@ -20,18 +20,20 @@ public class Tag
 	readonly List<HtmlNode> kids = [];
 	readonly ISig sigPreRender = new Sig();
 	readonly ISig sigPostRender = new SigAsync();
+	string? id_;
 
-	public string Id { get; }
-
-	public Tag(string name, string? id = null)
+	public string Id
 	{
-		this.name = name;
-		Id = id ?? IdGen.Make();
-
-		var readyDispatchId = $"{Id}-OnReady";
-		sigPreRender.Subscribe(_ => Events.Listen(readyDispatchId, sigPostRender.Trig));
-		this.Run("_ => dispatch(____0____, {})", e => e.JSRepl_Val(0, readyDispatchId));
+		get => id_ ??= IdGen.Make();
+		set
+		{
+			if (id_ != null) throw new InvalidOperationException("Id can only be set once. You neet to call id() before listen() or Run()");
+			id_ = value;
+		}
 	}
+
+
+	internal Tag(string name) => this.name = name;
 
 	
 	public object ToDump() => Util.RawHtml(RenderString(true));
@@ -41,7 +43,13 @@ public class Tag
 	internal string RenderString(bool runJs)
 	{
 		if (runJs)
+		{
+			var readyDispatchId = $"{Id}-OnReady";
+			Events.Listen(readyDispatchId, sigPostRender.Trig);
+			this.Run("_ => dispatch(____0____, {})", e => e.JSRepl_Val(0, readyDispatchId));
+			
 			sigPreRender.Trig();
+		}
 
 		var sb = new StringBuilder();
 		sb.WriteTagOpenStart(name);
@@ -63,6 +71,7 @@ public class Tag
 	}
 
 	// @formatter:off
+	public Tag id(string id__)											=> this.With(() => Id = id__);
 	public Tag this[params HtmlNode[] kids_]							=> this.With(() => kids.AddRange(kids_));
 	public Tag cls(string className, bool condition = true)				=> this.With(() => classes.Add(className), condition);
 	public Tag style(string style, bool condition = true)				=> this.With(() => styles.Add(style), condition);
