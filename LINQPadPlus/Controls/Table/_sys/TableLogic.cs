@@ -248,7 +248,10 @@ static class TableLogic
 		searchBarCtrls = [..opts.ExtraCtrlsPrepend, ..searchBarCtrls, ..opts.ExtraCtrlsAppend];
 
 		if (displayRowCount)
-			searchBarCtrls = [t.Span.id(RowCountId(id)), ..searchBarCtrls];
+			searchBarCtrls = [
+				t.Input.id(RowCountId(id)).style("width:100px").attr("readonly", true),
+				..searchBarCtrls,
+			];
 
 		var jsInitDisplayRowCount = displayRowCount switch
 		{
@@ -257,7 +260,7 @@ static class TableLogic
 				"""
 				
 				table.on("dataFiltered", function (filters, rows) {
-					document.getElementById(____0____).innerText = `rows:${rows.length}`;
+					document.getElementById(____0____).value = `${rows.length} rows`;
 				});
 				""",
 				e => e
@@ -290,20 +293,15 @@ static class TableLogic
 		if (opts.Dbg_)
 			Util.SyntaxColorText(finalJS, SyntaxLanguageStyle.JavaScript).Dump();
 
-		var tag = t.Div
-			.cls(CtrlsClasses.TableWrapper)
-			.style($"width:{opts.Width}px; display:inline-block", opts.Width.HasValue)
+		var tag = t.Div.style($"width:{opts.Width}px; display:inline-block", opts.Width.HasValue)
 			[
-				t.Div
-					.cls(CtrlsClasses.HorzCtrlRow)
-					.cls(CtrlsClasses.TableControls)
+				t.Div.style("display:flex; align-items:baseline; column-gap:5px; padding: 10px 0px 5px 0px")
 					[
 						searchBarCtrls.ToArray()
 					]
 					.If(searchBarCtrls.Any()),
 
-				t.Div.id(id)
-					.js(finalJS)
+				t.Div.id(id).js(finalJS)
 			];
 
 
