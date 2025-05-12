@@ -6,7 +6,20 @@
   <Namespace>System.Text.Json</Namespace>
 </Query>
 
-void OnStart() => LINQPadPlusSetup.Init();
+void OnStart()
+{
+	LINQPadPlusSetup.Init();
+	
+	Util.HtmlHead.AddCssLink("https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css");
+	JS.Run("""document.documentElement.setAttribute("data-theme", "dark");""");
+	Util.HtmlHead.AddStyles("""
+	:root {
+		--pico-spacing: 0rem;								/* 1rem */
+		--pico-form-element-spacing-vertical: 0.375rem;		/* 0.75rem */
+		--pico-form-element-spacing-horizontal: 0.5rem;		/* 1rem */
+	}
+	""");
+}
 
 
 void Main()
