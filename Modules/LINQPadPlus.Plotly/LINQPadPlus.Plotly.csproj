@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="_sys\Themes\dark.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="_sys\Themes\dark.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\LINQPadPlus\LINQPadPlus.csproj" />
+  </ItemGroup>
+
+</Project>

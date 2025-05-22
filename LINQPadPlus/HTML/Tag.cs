@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
+using System.Text;
 using LINQPad;
 using LINQPadPlus._sys;
 using LINQPadPlus._sys.Utils;
@@ -18,46 +20,48 @@ public class Tag
 	readonly HashSet<string> classes = [];
 	readonly List<string> styles = [];
 	readonly List<HtmlNode> kids = [];
-	readonly ISig sigPreRender = new Sig();
-	readonly ISig sigPostRender = new SigAsync();
-	string? id_;
+	readonly ISig whenPreRender = new Sig();
+	readonly ISig whenPostRender = new SigAsync();
 
+	public IObservable<Unit> WhenPostRender => whenPostRender;
+
+	[field: AllowNull, MaybeNull]
 	public string Id
 	{
-		get => id_ ??= IdGen.Make();
+		get => field ??= IdGen.Make();
 		set
 		{
-			if (id_ != null) throw new InvalidOperationException("Id can only be set once. You neet to call id() before listen() or Run()");
-			id_ = value;
+			if (field != null) throw new InvalidOperationException("Id can only be set once. You neet to call id() before listen() or Run()");
+			field = value;
 		}
 	}
 
 
-	internal Tag(string name) => this.name = name;
+	protected internal Tag(string name) => this.name = name;
 
 	
 	public object ToDump() => Util.RawHtml(RenderString(true));
 
-	public override string ToString() => RenderString(false);
+	public override string ToString() => RenderString(false).BeautifyHtml();
 
 	internal string RenderString(bool runJs)
 	{
 		if (runJs)
 		{
 			var readyDispatchId = $"{Id}-OnReady";
-			Events.Listen(readyDispatchId, sigPostRender.Trig);
+			Events.Listen(readyDispatchId, whenPostRender.Trig);
 			this.Run("_ => dispatch(____0____, {})", e => e.JSRepl_Val(0, readyDispatchId));
 			
-			sigPreRender.Trig();
+			whenPreRender.Trig();
 		}
 
 		var sb = new StringBuilder();
 		sb.WriteTagOpenStart(name);
 		sb.WriteId(Id);
 		sb.WriteClasses(classes);
-		sb.WriteStyles(styles);
 		foreach (var (key, val) in attrs.Where(t => t.Value != null))
 			val!.WriteAttribute(sb, key);
+		sb.WriteStyles(styles);
 		sb.WriteTagOpenEnd();
 		
 		foreach (var kid in kids)
@@ -66,18 +70,25 @@ public class Tag
 			sb.Append(kidStr);
 		}
 
-		sb.WriteTagClose(name);
+		if (!t.VoidElements.Contains(name))
+			sb.WriteTagClose(name);
+		
 		return sb.ToString();
 	}
 
 	// @formatter:off
 	public Tag id(string id__)											=> this.With(() => Id = id__);
-	public Tag this[params HtmlNode[] kids_]							=> this.With(() => kids.AddRange(kids_));
 	public Tag cls(string className, bool condition = true)				=> this.With(() => classes.Add(className), condition);
 	public Tag style(string style, bool condition = true)				=> this.With(() => styles.Add(style), condition);
 	public Tag attr(string key, JSVal? value, bool condition = true)	=> this.With(() => attrs[key] = value, condition);
 	// @formatter:on
 
+	public Tag this[params HtmlNode[] kids_] => this.With(() =>
+	{
+		if (t.VoidElements.Contains(name))
+			throw new ArgumentException($"<{name}> elements cannot have children");
+		kids.AddRange(kids_);
+	});
 
 	public Tag js(
 		string onRender,
@@ -86,18 +97,29 @@ public class Tag
 		[CallerLineNumber] int srcLine = 0
 	) =>
 	// ReSharper disable ExplicitCallerInfoArgument
-		this.With(() => sigPostRender.Subscribe(_ => this.Run(onRender, null, srcMember, srcFile, srcLine)));
+		this.With(() => whenPostRender.Subscribe(_ => this.Run(onRender, null, srcMember, srcFile, srcLine)));
 	// ReSharper restore ExplicitCallerInfoArgument
-
-
-	public Tag enable(RoVar<bool> Δon) => AddMutator(Mutator.Make(
-		Δon,
-		on => attrs["disabled"] = $"{!on}",
-		"(elt, on) => elt.disabled = !on"
-	));
-
 	
-	public Tag onReady(Action onReady) => this.With(() => sigPostRender.Subscribe(_ => onReady()));
+	
+	public Tag on<T>(IRoVar<T> Δrx, Func<Tag, T, Tag> preRender, string postRender) =>
+		this.With(() =>
+		{
+			whenPreRender.Subscribe(_ => preRender(this, Δrx.V));
+			Obs.CombineLatest(whenPostRender, Δrx, (_, state) => state)
+				.Subscribe(state => this.Run(
+					"""
+					function (elt) {
+						(____0____)(elt, ____1____);
+					}
+					""",
+					e => e
+						.JSRepl_Obj(0, postRender)
+						.JSRepl_Val(1, JSVal.Make(state))
+				), Δrx.CancelToken);
+		});
+
+
+	public Tag onReady(Action onReady) => this.With(() => whenPostRender.Subscribe(_ => onReady()));
 	
 	
 	public Tag listen(string eventName, string? js, Action<string> action, bool condition = true) =>
@@ -105,7 +127,7 @@ public class Tag
 		{
 			var dispatchId = $"{Id}-{eventName}";
 
-			sigPreRender.Subscribe(_ =>
+			whenPreRender.Subscribe(_ =>
 				Events.Listen(dispatchId, () =>
 				{
 					var args = js switch
@@ -128,7 +150,7 @@ public class Tag
 				})
 			);
 
-			sigPostRender.Subscribe(_ =>
+			whenPostRender.Subscribe(_ =>
 				this.Run(
 					"""
 					function (elt) {
@@ -143,26 +165,6 @@ public class Tag
 				)
 			);
 		}, condition);
-
-
-
-
-
-	Tag AddMutator(Mutator mutator) => this.With(() =>
-	{
-		sigPreRender.Subscribe(_ => mutator.SetOffline(mutator.State.V));
-		Obs.CombineLatest(sigPostRender, mutator.State, (_, state) => state)
-			.Subscribe(state => this.Run(
-				"""
-				function (elt) {
-					(____0____)(elt, ____1____);
-				}
-				""",
-				e => e
-					.JSRepl_Obj(0, mutator.SetOnline)
-					.JSRepl_Val(1, state)
-			)).D(D);
-	});
 }
 
 

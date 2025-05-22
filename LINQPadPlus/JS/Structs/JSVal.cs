@@ -61,6 +61,19 @@ public sealed class JSVal
 		}
 	}
 
+	public static JSVal Make<T>(T value)
+	{
+		if (typeof(T) == typeof(I))
+			return new JSVal((I)(object)value!);
+		if (typeof(T) == typeof(D))
+			return new JSVal((D)(object)value!);
+		if (typeof(T) == typeof(B))
+			return new JSVal((B)(object)value!);
+		if (typeof(T) == typeof(S))
+			return new JSVal((S)(object)value!);
+		throw new ArgumentException($"Cannot convert {typeof(T)} to JSVal");
+	}
+
 
 	public static implicit operator JSVal(I v) => new(v);
 	public static implicit operator JSVal(D v) => new(v);

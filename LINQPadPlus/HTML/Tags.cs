@@ -4,6 +4,12 @@ namespace LINQPadPlus;
 // https://www.geeksforgeeks.org/html-tags-a-to-z-list/
 public static class t
 {
+	internal static readonly HashSet<string> VoidElements =
+	[
+		"area", "base", "br", "col", "embed", "hr", "img", "input",
+		"keygen", "link", "meta", "param", "source", "track", "wbr",
+	];
+	
 	public static Tag H1 => new("h1");
 	public static Tag H2 => new("h2");
 	public static Tag H3 => new("h3");

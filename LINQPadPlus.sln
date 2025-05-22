@@ -13,6 +13,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LINQPadPlus.Plotly", "Modules\LINQPadPlus.Plotly\LINQPadPlus.Plotly.csproj", "{0E70829A-34A1-45A7-9F83-72EDC4B93026}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LINQPadPlus.Tabulator", "Modules\LINQPadPlus.Tabulator\LINQPadPlus.Tabulator.csproj", "{E5DF7565-AF20-4234-A6BC-AFFC54CDC30E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linqpad-samples", "linqpad-samples", "{6063147A-83B6-49DE-AAE8-555560F9444E}"
+	ProjectSection(SolutionItems) = preProject
+		linqpad-samples\data-exchanges.json = linqpad-samples\data-exchanges.json
+		linqpad-samples\data-symbols.json = linqpad-samples\data-symbols.json
+		linqpad-samples\FileOrder.txt = linqpad-samples\FileOrder.txt
+		linqpad-samples\Run JavaScript code.linq = linqpad-samples\Run JavaScript code.linq
+		linqpad-samples\Table selector.linq = linqpad-samples\Table selector.linq
+		linqpad-samples\Table viewer.linq = linqpad-samples\Table viewer.linq
+		linqpad-samples\Tags basics (HTML elements).linq = linqpad-samples\Tags basics (HTML elements).linq
+		linqpad-samples\Tags listen to events.linq = linqpad-samples\Tags listen to events.linq
+		linqpad-samples\Tags render callbacks.linq = linqpad-samples\Tags render callbacks.linq
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,9 +42,22 @@ Global
 		{2A9AFB8D-6144-452A-AEA8-9260E93B5C07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A9AFB8D-6144-452A-AEA8-9260E93B5C07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A9AFB8D-6144-452A-AEA8-9260E93B5C07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E70829A-34A1-45A7-9F83-72EDC4B93026}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E70829A-34A1-45A7-9F83-72EDC4B93026}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E70829A-34A1-45A7-9F83-72EDC4B93026}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E70829A-34A1-45A7-9F83-72EDC4B93026}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5DF7565-AF20-4234-A6BC-AFFC54CDC30E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5DF7565-AF20-4234-A6BC-AFFC54CDC30E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5DF7565-AF20-4234-A6BC-AFFC54CDC30E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5DF7565-AF20-4234-A6BC-AFFC54CDC30E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0E70829A-34A1-45A7-9F83-72EDC4B93026} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{E5DF7565-AF20-4234-A6BC-AFFC54CDC30E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{6063147A-83B6-49DE-AAE8-555560F9444E} = {8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7419A831-1EA6-4E66-ABC4-1403D6758F8A}

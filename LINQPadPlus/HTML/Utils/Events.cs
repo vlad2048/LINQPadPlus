@@ -31,7 +31,7 @@ public static class Events
 				.JSRepl_Var(0, DispatcherDivId)
 		);
 		
-		ListenWithArguments(ErrorDispatcherId, JSRunLogic.ErrorReceived);
+		ListenWithArg(ErrorDispatcherId, JSRunLogic.ErrorReceived);
 	}
 	
 	
@@ -39,7 +39,7 @@ public static class Events
 	/// Warning
 	/// Much slower than Listen() for some reason
 	/// </summary>
-	static void ListenWithArguments(string dispatchId, Action<string> action)
+	public static void ListenWithArg(string dispatchId, Action<string> action)
 	{
 		static string ReadProp(PropertyEventArgs args)
 		{
