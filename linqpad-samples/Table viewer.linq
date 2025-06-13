@@ -1,12 +1,15 @@
 <Query Kind="Program">
   <NuGetReference>LINQPadPlus</NuGetReference>
+  <NuGetReference>LINQPadPlus.Tabulator</NuGetReference>
   <Namespace>LINQPadPlus</Namespace>
   <Namespace>System.Text.Json</Namespace>
+  <Namespace>LINQPadPlus.Tabulator</Namespace>
 </Query>
 
 void OnStart()
 {
 	LINQPadPlusSetup.Init();
+	LINQPadPlusTabulatorSetup.Init();
 
 	Util.HtmlHead.AddCssLink("https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css");
 	JS.Run("""document.documentElement.setAttribute("data-theme", "dark");""");

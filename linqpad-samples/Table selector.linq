@@ -1,15 +1,18 @@
 <Query Kind="Program">
   <NuGetReference>LINQPadPlus</NuGetReference>
+  <NuGetReference>LINQPadPlus.Tabulator</NuGetReference>
   <Namespace>LINQPad.Controls</Namespace>
   <Namespace>LINQPadPlus</Namespace>
   <Namespace>LINQPadPlus.Rx</Namespace>
   <Namespace>System.Text.Json</Namespace>
+  <Namespace>LINQPadPlus.Tabulator</Namespace>
 </Query>
 
 void OnStart()
 {
 	LINQPadPlusSetup.Init();
-	
+	LINQPadPlusTabulatorSetup.Init();
+
 	Util.HtmlHead.AddCssLink("https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css");
 	JS.Run("""document.documentElement.setAttribute("data-theme", "dark");""");
 	Util.HtmlHead.AddStyles("""
@@ -28,7 +31,7 @@ void Main()
 	var symbols = Load<Symbol>("data-symbols.json");
 
 	var (Δexchange, exchangeUI) = exchanges.ToTableSelector(Tables.Exchanges);
-	var ΔsymbolsInExchange = Δexchange.SelectVar(exchange => symbols.Where(e => e.Mic == exchange.Name).ToArray());
+	var ΔsymbolsInExchange = Var.Expr(() => symbols.Where(e => e.Mic == Δexchange.V.Name).ToArray());
 	var (Δsymbol, symbolUI) = ΔsymbolsInExchange.ToTableSelector(Tables.Symbols);
 
 	t.Div.style("display:flex; column-gap:20px")[[

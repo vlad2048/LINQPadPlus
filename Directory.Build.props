@@ -5,7 +5,7 @@
     <EnablePreviewFeatures>True</EnablePreviewFeatures>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>0.0.7</Version>
+    <Version>0.0.8</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>vlad2048</Authors>
     <Description>LINQPad utilities to run JavaScript, render dynamic HTML, plotting and more</Description>
