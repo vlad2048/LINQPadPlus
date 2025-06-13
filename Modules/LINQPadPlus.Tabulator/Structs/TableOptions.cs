@@ -9,7 +9,9 @@ public sealed record TableOptions<T>(
 	int? Width = null,
 	int? Height = 300,
 	TableLayout? Layout = null,
-	int? PageSize = null
+	int? PageSize = null,
+	bool HeaderTooltip = false,
+	bool CellTooltip = false
 )
 {
 	readonly List<ColumnOptions<T>> columns = [];
@@ -42,14 +44,6 @@ public sealed record TableOptions<T>(
 
 	internal bool Dbg_ { get; private set; }
 	public TableOptions<T> Dbg() => this.With(() => Dbg_ = true);
-	
-	
-
-	/*internal bool EnableCellCopy_ { get; private set; }
-	public TableOptions<T> EnableCellCopy() => this.With(() => EnableCellCopy_ = true);
-
-	internal bool DisplayRowCount_ { get; private set; }
-	public TableOptions<T> DisplayRowCount() => this.With(() => DisplayRowCount_ = true);*/
 }
 
 

@@ -71,6 +71,8 @@ static class TableLogic
 						hozAlign = column.Align_.SerEnum(),
 						formatter = column.Fmt_,
 						visible = !column.Hide_,
+						headerTooltip = opts.HeaderTooltip,
+						tooltip = opts.HeaderTooltip,
 					}
 				)
 				.Concat(opts.SearchFields.Select((_, searchFieldIdx) =>
