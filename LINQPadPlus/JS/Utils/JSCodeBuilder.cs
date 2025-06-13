@@ -34,6 +34,9 @@ public static class JSCodeBuilder
 		var srcLines = src.SplitLines();
 		var dstLines = dst.SplitLines();
 
+		var d1 = srcLines.Index();
+		var d2 = d1.FirstOrDefault(t => t.Item2.Contains(marker, StringComparison.Ordinal), (-1, string.Empty));
+
 		var srcLineIdx = srcLines.Index().FirstOrDefault(t => t.Item2.Contains(marker, StringComparison.Ordinal), (-1, string.Empty)).Item1;
 		if (srcLineIdx == -1) return false;
 

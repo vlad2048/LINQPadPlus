@@ -61,8 +61,10 @@ static class TableJsonUtils
 	static readonly JsonSerializerOptions jsonOpt = new()
 	{
 		WriteIndented = true,
+#if NET9_0_OR_GREATER
 		IndentCharacter = '\t',
 		IndentSize = 1,
+#endif
 		Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
 		NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
 		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -138,8 +140,10 @@ static class TableJsonUtils
 		static readonly JsonSerializerOptions jsonOpt = new()
 		{
 			WriteIndented = true,
+#if NET9_0_OR_GREATER
 			IndentCharacter = '\t',
 			IndentSize = 1,
+#endif
 			Converters =
 			{
 				new EnumStyleConverter(),

@@ -25,7 +25,7 @@ sealed class PlotlyErrorPathConverter : JsonConverter<PlotlyErrorPath>
 		{
 			if (reader.TokenType == JsonTokenType.EndArray)
 			{
-				return values.ToArray();
+				return [..values];
 			}
 
 			if (reader.TokenType != JsonTokenType.String)
@@ -33,7 +33,7 @@ sealed class PlotlyErrorPathConverter : JsonConverter<PlotlyErrorPath>
 				throw new JsonException("Expected String token");
 			}
 
-			values.Add(reader.GetString());
+			values.Add(reader.GetString() ?? throw new NullReferenceException("Ouch"));
 		}
 
 		throw new JsonException("Expected EndArray token");

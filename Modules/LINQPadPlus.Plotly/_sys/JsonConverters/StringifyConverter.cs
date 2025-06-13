@@ -9,12 +9,12 @@ public sealed class StringifyConverter : JsonConverter<string>
 		reader.TokenType switch
 		{
 			JsonTokenType.String => reader.GetString(),
-			JsonTokenType.Number => reader.GetDouble().ToString(),
+			JsonTokenType.Number => $"{reader.GetDouble()}",
 			JsonTokenType.True => bool.TrueString,
 			JsonTokenType.False => bool.FalseString,
 			JsonTokenType.Null => "null",
 			_ => reader.Fmt(),
-		};
+		} ?? throw new NullReferenceException("Ouch");
 
 
 	public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions jsonOpt) => writer.WriteStringValue(value);

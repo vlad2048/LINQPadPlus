@@ -59,8 +59,10 @@ static class PlotlyJson
 	{
 		PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 		WriteIndented = indent,
+#if NET9_0_OR_GREATER
 		IndentCharacter = '\t',
 		IndentSize = 1,
+#endif
 		Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
 		NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
 		Converters =
@@ -78,8 +80,10 @@ static class PlotlyJson
 	static readonly JsonWriterOptions jsonWriterOpt = new()
 	{
 		Indented = true,
+#if NET9_0_OR_GREATER
 		IndentCharacter = '\t',
 		IndentSize = 1,
+#endif
 		Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
 	};
 
