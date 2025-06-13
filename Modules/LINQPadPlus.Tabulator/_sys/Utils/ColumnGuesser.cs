@@ -1,18 +1,46 @@
-﻿using System.Reflection;
+﻿using System.Dynamic;
+using System.Reflection;
 
 namespace LINQPadPlus.Tabulator._sys.Utils;
 
 static class ColumnGuesser
 {
-	public static ColumnOptions<T>[] Guess<T>() =>
-		typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)
+	public static ColumnOptions<T>[] Guess<T>(T item)
+	{
+		var t = item!.GetType();
+		if (t == typeof(ExpandoObject)) return GuessExpando(item);
+		return GuessOther<T>(t);
+	}
+
+	static ColumnOptions<T>[] GuessExpando<T>(T item)
+	{
+		if (item is not IDictionary<string, object> map) throw new ArgumentException("Impossible");
+		return map.Keys
+			.SelectA(e => new ColumnOptions<T>(
+				x =>
+				{
+					if (x is not IDictionary<string, object> xmap) throw new ArgumentException("Impossible");
+					return xmap.TryGetValue(e, out var val) switch
+					{
+						true => val,
+						false => "_",
+					};
+				},
+				e,
+				typeof(object)
+			));
+	}
+
+
+	static ColumnOptions<T>[] GuessOther<T>(Type t) =>
+		t.GetProperties(BindingFlags.Instance | BindingFlags.Public)
 			.SelectA(prop =>
 				new ColumnOptions<T>(
-					GuessFun<T>(prop),
-					GuessName(prop),
-					prop.PropertyType
-				)
-				.GuessAlign(prop)
+						GuessFun<T>(prop),
+						GuessName(prop),
+						prop.PropertyType
+					)
+					.GuessAlign(prop)
 			);
 
 

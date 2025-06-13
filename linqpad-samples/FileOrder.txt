@@ -4,5 +4,6 @@ Tags render callbacks.linq
 Tags listen to events.linq
 Table viewer.linq
 Table selector.linq
+Table with dynamic objects.linq
 data-exchanges.json
 data-symbols.json

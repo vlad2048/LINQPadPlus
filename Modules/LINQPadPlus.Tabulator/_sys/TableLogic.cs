@@ -19,7 +19,7 @@ static class TableLogic
 	{
 		if (onSelect != null && Δitems.V.Length == 0) throw new ArgumentException("Empty array not supported for a TableSelector");
 		opts ??= new TableOptions<T>();
-		var columns = opts.Columns ?? ColumnGuesser.Guess<T>();
+		var columns = opts.Columns ?? ColumnGuesser.Guess(Δitems.V[0]);
 		var id = IdGen.Make();
 
 		var enableCellCopy = onSelect == null;
