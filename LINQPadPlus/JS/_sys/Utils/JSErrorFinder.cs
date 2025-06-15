@@ -1,6 +1,8 @@
 ﻿using LINQPadPlus._sys.Structs;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace LINQPadPlus._sys.Utils;
 
@@ -22,7 +24,7 @@ static class JSErrorFinder
 		if (resObj is not string str) return null;
 		try
 		{
-			var err = JsonUtils.Deser<JSRuntimeError>(str);
+			var err = NewtonsoftJson.Deser<JSRuntimeError>(str);
 			return (err.Id != JSRunIdentifiers.RuntimeErrorIdentifier) switch
 			{
 				true => null,
@@ -66,4 +68,22 @@ static class JSErrorFinder
 
 		return null;
 	}
+}
+
+
+
+
+file static class NewtonsoftJson
+{
+	static readonly JsonSerializerSettings jsonOpt = new()
+	{
+		ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+		NullValueHandling = NullValueHandling.Ignore,
+		ContractResolver = new DefaultContractResolver
+		{
+			NamingStrategy = new SnakeCaseNamingStrategy(),
+		},
+	};
+
+	public static T Deser<T>(string str) => JsonConvert.DeserializeObject<T>(str, jsonOpt)!;
 }

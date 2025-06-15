@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\LINQPadPlus\LINQPadPlus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Structs\" />
+    <Folder Include="Utils\" />
+  </ItemGroup>
+
+</Project>
