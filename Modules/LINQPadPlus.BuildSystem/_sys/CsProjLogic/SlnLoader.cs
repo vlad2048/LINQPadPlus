@@ -1,13 +1,18 @@
 ﻿using System.Text.RegularExpressions;
-using LINQPadPlus.BuildSystem._sys.Reading.Structs;
-using LINQPadPlus.BuildSystem._sys.Reading.Xml;
+using LINQPad;
+using LINQPadPlus.BuildSystem._sys.CsProjLogic.Structs;
+using LINQPadPlus.BuildSystem._sys.CsProjLogic.Xml;
+using LINQPadPlus.BuildSystem._sys.GitLogic;
+using LINQPadPlus.BuildSystem._sys.Structs;
 using LINQPadPlus.BuildSystem._sys.Utils;
 
-namespace LINQPadPlus.BuildSystem._sys.Reading;
+namespace LINQPadPlus.BuildSystem._sys.CsProjLogic;
+
+
 
 static class SlnLoader
 {
-	public static Sln Load(string slnFile) => new(
+	public static SlnFileState Load(string slnFile, DumpContainer dc) => new(
 		
 		slnFile,
 		
@@ -20,7 +25,7 @@ static class SlnLoader
 		File.ReadAllLines(slnFile)
 			.ExtractPrjFilesRel()
 			.Select(prjFileRel => prjFileRel.ResolvePath(slnFile))
-			.SelectA(prjFile => new Prj(
+			.SelectA(prjFile => new PrjFileState(
 				
 				prjFile,
 				
@@ -50,7 +55,9 @@ static class SlnLoader
 					)
 				))
 				
-			))
+			)),
+		
+		GitOps.GetStatus(Path.GetDirectoryName(slnFile)!, dc)
 		
 	);
 

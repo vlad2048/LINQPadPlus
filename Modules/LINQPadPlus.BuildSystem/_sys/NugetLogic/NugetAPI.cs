@@ -1,65 +1,121 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using LINQPadPlus.BuildSystem._sys.Structs;
 
 namespace LINQPadPlus.BuildSystem._sys.NugetLogic;
 
 
-
-
-public record NugetIndex(
-	Version Version,
-	NugetIndex.Resource[] Resources
-)
-{
-	public record Resource(
-		[property: JsonPropertyName("@id")] string @Id,
-		[property: JsonPropertyName("@type")] string @Type,
-		string Comment
-	);
-}
-
-
-
-public record NugetSearchQueryService(
-	int TotalHits,
-	NugetSearchQueryService.Item[] Data
-)
-{
-	public record Item(
-		string Id,
-		string[] Authors,
-		Item.ItemVersion[] Versions
-	)
-	{
-		public record ItemVersion(
-			Version Version
-		);
-	}
-}
-
-
-
-
+// https://learn.microsoft.com/en-us/nuget/api/search-query-service-resource
 static class NugetAPI
 {
-	const string Url = "https://api.nuget.org/v3/index.json";
+	public static SlnNugetState GetState(SlnFileState sln) => new(
+		GetReleasedVersions(sln),
+		GetPendingVersions(sln)
+	);
+
+
+
+	static void CacheUpdate(string name, Version version) => cache[name] = version;
+
+
+
+	static IReadOnlyDictionary<string, Version> GetReleasedVersions(SlnFileState sln) =>
+		(
+			from prj in sln.Prjs
+			where prj.IsPackable
+			from item in Search(SearchUrl, prj.Name).Data
+			let maxVersion = item.Versions.Select(e => e.Version).Max()
+			select new
+			{
+				Name = item.Id,
+				Version = maxVersion,
+			}
+		)
+		.Distinct()
+		.ToDictionary(e => e.Name, e => e.Version);
+
+	static IReadOnlyDictionary<string, Version> GetPendingVersions(SlnFileState sln) =>
+		(
+			from prj in sln.Prjs
+			where prj.IsPackable
+			where cache.ContainsKey(prj.Name)
+			select new
+			{
+				prj.Name,
+				Version = cache[prj.Name],
+			}
+		)
+		.ToDictionary(e => e.Name, e => e.Version);
+
+	
+
+
+
+
 	static readonly HttpClient client = new();
+	static readonly Lazy<string> searchUrl = new(() => GetIndex().Resources.First(e => e.Type == "SearchQueryService").Id);
+	static string SearchUrl => searchUrl.Value;
+	static readonly Dictionary<string, Version> cache = [];
+	
 
 
-	public static NugetIndex GetIndex() =>
+	static NugetIndex GetIndex() =>
 		Get<NugetIndex>(
-			Url,
+			Consts.NugetUrl,
 			b => b
 		);
 	
-	public static NugetSearchQueryService Search(string url, string search, bool preRelease) =>
+	static NugetSearchQueryService Search(string url, string search) =>
 		Get<NugetSearchQueryService>(
 			url,
 			b => b
 				.Set("q", search)
-				.Set("prerelease", preRelease)
+				.Set("prerelease", false) // setting it to true does not include pending packages
 		);
+
+
+
+
+
+
+
+	sealed record NugetIndex(
+		Version Version,
+		NugetIndex.Resource[] Resources
+	)
+	{
+		public sealed record Resource(
+			[property: JsonPropertyName("@id")] string @Id,
+			[property: JsonPropertyName("@type")] string @Type,
+			string Comment
+		);
+	}
+
+
+
+	sealed record NugetSearchQueryService(
+		int TotalHits,
+		NugetSearchQueryService.Item[] Data
+	)
+	{
+		public sealed record Item(
+			string Id,
+			string[] Authors,
+			Item.ItemVersion[] Versions
+		)
+		{
+			public sealed record ItemVersion(
+				Version Version
+			);
+		}
+	}
+
+
+
+
+
+
 
 
 	interface IBuild

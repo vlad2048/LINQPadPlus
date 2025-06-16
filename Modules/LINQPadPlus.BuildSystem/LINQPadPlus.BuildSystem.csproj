@@ -9,8 +9,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Structs\" />
-    <Folder Include="Utils\" />
+    <Folder Include="_sys\GitLogic\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CliWrap" Version="3.9.0" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 // ReSharper disable UnusedMember.Global
 
-namespace LINQPadPlus.BuildSystem._sys;
+namespace LINQPadPlus.BuildSystem._sys.Utils;
 
 public abstract class Maybe<T> : IEquatable<Maybe<T>>
 {

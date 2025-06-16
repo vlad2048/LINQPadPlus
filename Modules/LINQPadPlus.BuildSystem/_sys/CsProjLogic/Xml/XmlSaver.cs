@@ -1,7 +1,7 @@
-﻿using System.Xml.Linq;
-using System.Xml;
+﻿using System.Xml;
+using System.Xml.Linq;
 
-namespace LINQPadPlus.BuildSystem._sys.Reading.Xml;
+namespace LINQPadPlus.BuildSystem._sys.CsProjLogic.Xml;
 
 static class XmlSaver
 {

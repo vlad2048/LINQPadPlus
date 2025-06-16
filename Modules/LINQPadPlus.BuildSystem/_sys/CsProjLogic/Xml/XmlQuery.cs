@@ -1,7 +1,8 @@
 ﻿using System.Xml.Linq;
 using System.Xml.XPath;
+using LINQPadPlus.BuildSystem._sys.Utils;
 
-namespace LINQPadPlus.BuildSystem._sys.Reading.Xml;
+namespace LINQPadPlus.BuildSystem._sys.CsProjLogic.Xml;
 
 static class XmlQuery
 {

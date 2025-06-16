@@ -1,9 +1,9 @@
 ﻿using System.Xml.Linq;
-using LINQPadPlus.BuildSystem._sys.Reading.Structs;
-using LINQPadPlus.BuildSystem._sys.Reading.Xml;
+using LINQPadPlus.BuildSystem._sys.CsProjLogic.Structs;
+using LINQPadPlus.BuildSystem._sys.CsProjLogic.Xml;
 using LINQPadPlus.BuildSystem._sys.Utils;
 
-namespace LINQPadPlus.BuildSystem._sys.Reading;
+namespace LINQPadPlus.BuildSystem._sys.CsProjLogic;
 
 
 interface IPrjReader

@@ -1,4 +1,6 @@
-﻿namespace LINQPadPlus.BuildSystem._sys.Reading.Structs;
+﻿using LINQPadPlus.BuildSystem._sys.Utils;
+
+namespace LINQPadPlus.BuildSystem._sys.CsProjLogic.Structs;
 
 enum PrjFlag
 {
