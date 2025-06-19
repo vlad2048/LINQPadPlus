@@ -1,11 +1,10 @@
 ﻿using System.Reactive.Linq;
-using LINQPad;
 
 namespace LINQPadPlus.BuildSystem;
 
 public static class RxFolderWatcher
 {
-	public static IObservable<string> Watch(string folder, TimeSpan debouncePeriod) =>
+	public static IObservable<string> Watch(string folder) =>
 		Obs.Using(
 			() => new FileSystemWatcher
 			{
@@ -17,10 +16,8 @@ public static class RxFolderWatcher
 			},
 			watcher => watcher
 				.WhenChanged()
-				//.Do(e => $"[{e.ChangeType}]  name:'{e.Name}'  fullpath:'{e.FullPath}'  valid:{IsNameValid(e.Name)}".Dump())
 				.Where(e => IsNameValid(e.Name))
 				.Select(e => e.FullPath)
-				.Throttle(debouncePeriod)
 		);
 
 	static bool IsNameValid(this string? f) => f != null && Path.GetFileName(f) != ".git";

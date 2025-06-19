@@ -61,5 +61,5 @@ public static class Cmd
 		}
 	}
 
-	static string[] SplitInLines(this string str) => str.Split('\n');
+	static string[] SplitInLines(this string str) => str.Split(Environment.NewLine);
 }

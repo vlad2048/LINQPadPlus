@@ -24,14 +24,6 @@ static class SlnStateLogic
 		).ToArray();
 		xs = xs.Del(xsNotPackable);
 
-		var xsErr = (
-			from x in xs
-			let maxVer = GetVersionInBoth(x, released, cached)
-			where maxVer > sln.Version
-			select x
-		).ToArray();
-		xs = xs.Del(xsErr);
-
 		var xsPending = (
 			from x in xs
 			let releasedVer = released.GetValueOrDefault(x)
@@ -41,6 +33,14 @@ static class SlnStateLogic
 			select x
 		).ToArray();
 		xs = xs.Del(xsPending);
+
+		var xsErr = (
+			from x in xs
+			let maxVer = GetVersionInBoth(x, released, cached)
+			where maxVer > sln.Version
+			select x
+		).ToArray();
+		xs = xs.Del(xsErr);
 
 		var xsNever = (
 			from x in xs
@@ -102,54 +102,12 @@ static class SlnStateLogic
 		return new PrjReleaseInfos(results);
 	}
 
-
-
-
-
-	public static UserActions GetUserActions_From_FileStateAndReleaseInfos(
-		SlnFileState file,
-		PrjReleaseInfos release
-	)
-	{
-		var list = new List<IUsr>();
-
-		var isGitNotClean = file.GitStatus != GitStatus.Clean;
-		var isAnyPrjError = release.Get(e => e is PrjStatus.ERROR).Length > 0;
-		var isAnyPrjPending = release.Get(e => e is PrjStatus.Pending).Length > 0;
-		var prjsReleasableLocally = release.Get(e => e is PrjStatus.Never or PrjStatus.Ready or PrjStatus.UptoDate);
-		var prjsReleasableRemotely = release.Get(e => e is PrjStatus.Never or PrjStatus.Ready);
-
-		if (isGitNotClean)
-		{
-			list.Add(new PushChangesUsr());
-		}
-		else if (!isAnyPrjError && !isAnyPrjPending)
-		{
-			list.Add(new BumpVersionUsr());
-
-			if (prjsReleasableLocally.Length > 0)
-			{
-				list.Add(new ReleaseLocallyUsr(prjsReleasableLocally));
-			}
-
-			if (prjsReleasableRemotely.Length > 0)
-			{
-				list.Add(new ReleaseRemotelyUsr(prjsReleasableRemotely));
-			}
-		}
-
-		return new UserActions([..list]);
-	}
-
-
-
-
-
+	
+	
 	public static Sln MakeFinal(
 		SlnFileState file,
 		SlnNugetState nuget,
-		PrjReleaseInfos release,
-		UserActions actions
+		PrjReleaseInfos release
 	) => new(
 		file.File,
 		file.Version,
@@ -162,8 +120,7 @@ static class SlnStateLogic
 			release.Map[prj.Name].VersionReleased,
 			release.Map[prj.Name].VersionPending
 		)).ToArray(),
-		file.GitStatus,
-		actions
+		file.GitStatus
 	);
 	
 	

@@ -16,7 +16,7 @@ static class NugetAPI
 
 
 
-	static void CacheUpdate(string name, Version version) => cache[name] = version;
+	public static void CacheUpdate(string name, Version version) => cache[name] = version;
 
 
 

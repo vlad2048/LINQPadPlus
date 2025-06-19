@@ -16,6 +16,7 @@ public static class t
 	public static Tag H4 => new("h4");
 	public static Tag H5 => new("h5");
 	public static Tag H6 => new("h6");
+	public static Tag A => new("a");
 
 	public static Tag Abbreviation => new("abbreviation");
 	public static Tag Acronym => new("acronym");

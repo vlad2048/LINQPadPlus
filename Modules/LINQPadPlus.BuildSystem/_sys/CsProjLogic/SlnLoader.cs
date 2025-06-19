@@ -12,28 +12,41 @@ namespace LINQPadPlus.BuildSystem._sys.CsProjLogic;
 
 static class SlnLoader
 {
-	public static SlnFileState Load(string slnFile, DumpContainer dc) => new(
-		
+	public static async Task<SlnFileState> Load(string slnFile, DumpContainer dc)
+	{
+		try
+		{
+			return await LoadInternal(slnFile, dc);
+		}
+		catch (Exception ex)
+		{
+			dc.Log($"File error: [{ex.GetType().FullName}] {ex.Message}");
+			throw;
+		}
+	}
+	
+	static async Task<SlnFileState> LoadInternal(string slnFile, DumpContainer dc) => new(
+
 		slnFile,
-		
+
 		XmlFile.Read(
 			slnFile.GetDirectoryBuildPropsFile(),
 			r => r.GetValue("/Project/PropertyGroup/Version")
 				.AsVersion().Ensure("Failed to parse solution Version")
 		),
-	
-		File.ReadAllLines(slnFile)
+
+		(await File.ReadAllLinesAsync(slnFile))
 			.ExtractPrjFilesRel()
 			.Select(prjFileRel => prjFileRel.ResolvePath(slnFile))
 			.SelectA(prjFile => new PrjFileState(
-				
+
 				prjFile,
-				
+
 				XmlFile.Read(
 					prjFile,
 					r => r.GetValueFlag(PrjFlag.IsPackable)
 				),
-				
+
 				XmlFile.Read(
 						prjFile,
 						r => r.GetItems(
@@ -45,7 +58,7 @@ static class SlnLoader
 					.SelectA(prjRefFile => new PrjRef(
 						prjRefFile
 					)),
-				
+
 				XmlFile.Read(prjFile, r => r.GetItems(
 					"//PackageReference",
 					e => new PkgRef(
@@ -54,14 +67,13 @@ static class SlnLoader
 							.AsVersion().Ensure($"Failed to parse version: '{e.GetAttr("Version")}' in {prjFile}")
 					)
 				))
-				
+
 			)),
-		
+
 		GitOps.GetStatus(Path.GetDirectoryName(slnFile)!, dc)
-		
+
 	);
 
-	static string GetDirectoryBuildPropsFile(this string slnFile) => Path.Combine(Path.GetDirectoryName(slnFile)!, "Directory.Build.props");
 
 
 	static string ResolvePath(this string prjFileRel, string refFile) =>

@@ -9,19 +9,48 @@ sealed record Sln(
 	string File,
 	Version Version,
 	Prj[] Prjs,
-	GitStatus GitStatus,
-	[property: JsonIgnore]
-	UserActions Actions
+	GitStatus GitStatus
 )
 {
-	[JsonIgnore]
-	public string Name => Path.GetFileNameWithoutExtension(File);
-
-
+	[JsonIgnore] public string Name => Path.GetFileNameWithoutExtension(File);
+	[JsonIgnore] public string Folder => Path.GetDirectoryName(File) ?? throw new ArgumentException($"Solution file has no folder: '{File}'");
+	[JsonIgnore] public string DirectoryBuildPropsFile => File.GetDirectoryBuildPropsFile();
 	public static readonly IEqualityComparer<Sln> EqualityComparer = EqualityUtils.Make<Sln, string>(e => JsonSerializer.Serialize(e));
 }
 
 
+public enum PrjStatus
+{
+	/// <summary>
+	/// IsPackable=False
+	/// </summary>
+	NotPackable,
+	
+	/// <summary>
+	/// Has never been released to nuget yet
+	/// </summary>
+	Never,
+
+	/// <summary>
+	/// Nuget.Version &lt; Sln.Version
+	/// </summary>
+	Ready,
+
+	/// <summary>
+	/// Nuget.CachedVersion &gt; Nuget.Version
+	/// </summary>
+	Pending,
+
+	/// <summary>
+	/// Nuget.Version = Sln.Version
+	/// </summary>
+	UptoDate,
+
+	/// <summary>
+	/// Nuget.Version &gt; Sln.Version
+	/// </summary>
+	ERROR,
+}
 
 sealed record Prj(
 	string File,
@@ -56,20 +85,33 @@ sealed record Prj(
 
 
 
+static class SlnUtils
+{
+	public static bool IsReleasable(this Sln sln, out string? reason)
+	{
+		if (sln.GitStatus is not GitStatus.Clean)
+		{
+			reason = "Git needs to be clean";
+			return false;
+		}
+
+		var prjs = sln.Prjs.WhereA(e => e.IsPackable);
+		if (prjs.Length == 0)
+		{
+			reason = "No packable projects";
+			return false;
+		}
+
+		var prjsNotReady = prjs.WhereA(e => e.Status is not PrjStatus.Ready);
+		if (prjsNotReady.Length > 0)
+		{
+			reason = $"Projects not ready: {string.Join(", ", prjsNotReady.Select(e => e.Name))}";
+			return false;
+		}
+
+		reason = null;
+		return true;
+	}
+}
 
 
-
-/*return new Sln(
-	"LINQPadPlus",
-	new Version(0, 0, 10),
-	[
-		new Prj("LINQPadPlus", false, [], [], PrjStatus.NotPackable, null, null),
-		new Prj("LINQPadPlus.Plotly", true, [], [], PrjStatus.Never, null, null),
-		new Prj("LINQPadPlus.Tabulator", true, [], [], PrjStatus.Ready, new Version(0, 0, 9), null),
-		new Prj("LINQPadPlus.BuildSystem", true, [], [], PrjStatus.Pending, new Version(0, 0, 9), new Version(0, 0, 10)),
-		new Prj("LINQPadPlus.Other", true, [], [], PrjStatus.UptoDate, new Version(0, 0, 10), null),
-		new Prj("LINQPadPlus.Milou", true, [], [], PrjStatus.ERROR, new Version(0, 0, 16), null),
-	],
-	GitStatus.UnStaged,
-	new Dictionary<string, Version>()
-);*/

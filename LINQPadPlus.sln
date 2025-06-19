@@ -34,6 +34,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linqpad-samples", "linqpad-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LINQPadPlus.BuildSystem", "Modules\LINQPadPlus.BuildSystem\LINQPadPlus.BuildSystem.csproj", "{5D67F65B-8ADE-42AF-B20F-D459FB1D8F39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LINQPadPlus.BuildSystem.Tests", "Modules\LINQPadPlus.BuildSystem.Tests\LINQPadPlus.BuildSystem.Tests.csproj", "{02D7BB24-31CD-4429-A55F-A8EEF0D435C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{5D67F65B-8ADE-42AF-B20F-D459FB1D8F39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D67F65B-8ADE-42AF-B20F-D459FB1D8F39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D67F65B-8ADE-42AF-B20F-D459FB1D8F39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02D7BB24-31CD-4429-A55F-A8EEF0D435C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02D7BB24-31CD-4429-A55F-A8EEF0D435C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02D7BB24-31CD-4429-A55F-A8EEF0D435C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02D7BB24-31CD-4429-A55F-A8EEF0D435C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +71,7 @@ Global
 		{E5DF7565-AF20-4234-A6BC-AFFC54CDC30E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{6063147A-83B6-49DE-AAE8-555560F9444E} = {8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}
 		{5D67F65B-8ADE-42AF-B20F-D459FB1D8F39} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{02D7BB24-31CD-4429-A55F-A8EEF0D435C3} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7419A831-1EA6-4E66-ABC4-1403D6758F8A}

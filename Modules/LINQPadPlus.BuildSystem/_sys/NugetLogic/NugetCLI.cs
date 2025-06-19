@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using LINQPad;
 
 namespace LINQPadPlus.BuildSystem._sys.NugetLogic;
@@ -9,8 +7,8 @@ static class NugetCLI
 {
 	const string GlobalPackagesPrefix = "global-packages: ";
 	static readonly Lazy<string> globalPackagesFolder = new(() => Cmd.RunAndParse("nuget", null, ["locals", "global-packages", "-list"], ParseGlobalPackagesFolder, null));
-	static string GlobalPackagesFolder => globalPackagesFolder.Value;
-
+	public static string GlobalPackagesFolder => globalPackagesFolder.Value;
+	
 
 	public static void Release(string prjFile, bool remote, string apiKey, DumpContainer dc)
 	{
@@ -21,21 +19,30 @@ static class NugetCLI
 		Delete(folderRelease, "*.nupkg");
 		Cmd.Run("dotnet", folder, ["pack"], dc);
 		var pkgFile = Directory.GetFiles(folderRelease, "*.nupkg").Single().EnsureFileExists();
-		var version = pkgFile.ExtractVersion();
+		var pkgFileRel = pkgFile.MakeRelativeTo(folder);
+		var version = pkgFileRel.ExtractVersion();
 
-		Cmd.Run("nuget", folder, ["add", pkgFile, "-source", GlobalPackagesFolder, "-expand"], dc);
+		Cmd.Run("nuget", folder, ["add", pkgFileRel, "-source", GlobalPackagesFolder, "-expand"], dc);
 		Path.Combine(GlobalPackagesFolder, name.ToLowerInvariant(), $"{version}").EnsureFolderExists();
 
 		if (remote)
 		{
 			Cmd.Run("nuget", folder, ["setapikey", apiKey, "-source", Consts.NugetUrl], dc);
-			Cmd.Run("nuget", folder, ["push", pkgFile, "-source", Consts.NugetUrl], dc);
+			Cmd.Run("nuget", folder, ["push", pkgFileRel, "-source", Consts.NugetUrl], dc);
+			NugetAPI.CacheUpdate(Path.GetFileNameWithoutExtension(prjFile), version);
 		}
 
 		File.Delete(pkgFile);
 	}
-	
 
+
+
+	static string MakeRelativeTo(this string file, string folder)
+	{
+		folder = Path.GetFullPath(folder);
+		file = Path.GetFullPath(file);
+		return Path.GetRelativePath(folder, file);
+	}
 	static void Delete(string folder, string filter)
 	{
 		foreach (var file in Directory.GetFiles(folder, filter))
@@ -47,11 +54,10 @@ static class NugetCLI
 			throw new FileNotFoundException($"File not found: {file}");
 		return file;
 	}
-	static string EnsureFolderExists(this string folder)
+	static void EnsureFolderExists(this string folder)
 	{
 		if (!Directory.Exists(folder))
 			throw new FileNotFoundException($"Folder not found: {folder}");
-		return folder;
 	}
 	static Version ExtractVersion(this string file)
 	{

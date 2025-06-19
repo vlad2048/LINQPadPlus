@@ -8,11 +8,24 @@ static class GitOps
 {
 	public static void PushChanges(string folder, string msg, DumpContainer dc)
 	{
+		try
+		{
+			PushChangesInternal(folder, msg, dc);
+		}
+		catch (Exception ex)
+		{
+			dc.AppendContent(ex);
+			throw;
+		}
+	}
+	
+	static void PushChangesInternal(string folder, string msg, DumpContainer dc)
+	{
 		var status = GetStatus(folder, dc);
 		dc.Log($"  -> {status}");
 		
 		void RunAdd() => Cmd.Run("git", folder, ["add", "*"], dc);
-		void RunCommit() => Cmd.Run("git", folder, ["commit", "-m", msg.Quote()], dc);
+		void RunCommit() => Cmd.Run("git", folder, ["commit", "-m", msg], dc);
 		void RunPush() => Cmd.Run("git", folder, ["push"], dc);
 
 		switch (status)
