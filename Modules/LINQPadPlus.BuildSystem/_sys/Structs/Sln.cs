@@ -102,10 +102,10 @@ static class SlnUtils
 			return false;
 		}
 
-		var prjsNotReady = prjs.WhereA(e => e.Status is not PrjStatus.Ready);
+		var prjsNotReady = prjs.WhereA(e => e.Status != PrjStatus.Ready && e.Status != PrjStatus.Never);
 		if (prjsNotReady.Length > 0)
 		{
-			reason = $"Projects not ready: {string.Join(", ", prjsNotReady.Select(e => e.Name))}";
+			reason = $"Projects not ready (or never released): {string.Join(", ", prjsNotReady.Select(e => e.Name))}";
 			return false;
 		}
 
