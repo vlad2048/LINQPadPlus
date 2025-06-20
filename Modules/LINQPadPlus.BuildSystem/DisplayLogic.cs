@@ -62,9 +62,7 @@ static class DisplayLogic
 	public static void InitCss() =>
 		Util.HtmlHead.AddStyles(
 			"""
-				.typeheader {
-					display: none;
-				}
+			/* .typeheader { display: none; } */
 			""");
 
 	public static object Display(this Sln sln, IRwVar<string> ΔcommitMsg, IExec exec) => new
