@@ -45,6 +45,7 @@ static class NugetCLI
 	}
 	static void Delete(string folder, string filter)
 	{
+		if (!Directory.Exists(folder)) return;
 		foreach (var file in Directory.GetFiles(folder, filter))
 			File.Delete(file);
 	}
