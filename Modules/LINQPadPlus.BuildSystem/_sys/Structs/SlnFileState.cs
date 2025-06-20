@@ -14,11 +14,11 @@ sealed record SlnFileState(
 	[JsonIgnore] public string[] IgnoreFolders =>
 	[
 		Path.Combine(Folder, ".git"),
-		..Prjs.SelectMany(prj => new[]
+		/*..Prjs.SelectMany(prj => new[]
 		{
 			Path.Combine(prj.Folder, "bin"),
 			Path.Combine(prj.Folder, "obj"),
-		}),
+		}),*/
 	];
 }
 
