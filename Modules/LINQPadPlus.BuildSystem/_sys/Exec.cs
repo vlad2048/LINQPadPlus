@@ -31,7 +31,7 @@ sealed class TestExec : IExec
 
 sealed class Exec(DumpContainer dc, string nugetApiKey) : IExec
 {
-	public Version BumpVersion(Sln sln)
+	public Version BumpVersion(Sln sln) => Wrap(sln.Version, () =>
 	{
 		var versionBump = sln.Version.Bump();
 		XmlFile.Write(
@@ -39,14 +39,15 @@ sealed class Exec(DumpContainer dc, string nugetApiKey) : IExec
 			e => e.SetValue("/Project/PropertyGroup/Version", $"{versionBump}")
 		);
 		return versionBump;
-	}
+	});
 
-	public void Push(Sln sln, string commitMsg) =>
+	public void Push(Sln sln, string commitMsg) => Wrap(() =>
+	{
 		GitOps.PushChanges(sln.Folder, commitMsg, dc);
+	});
 
 	public void Release(Sln sln) => Wrap(() =>
 	{
-		throw new ArgumentException("Ahah");
 		if (!sln.IsReleasable(out var reason))
 			throw new ArgumentException($"Impossible. Solution is not releasable: {reason}");
 		foreach (var prj in sln.Prjs.WhereA(e => e.Status is PrjStatus.Ready))
@@ -57,8 +58,10 @@ sealed class Exec(DumpContainer dc, string nugetApiKey) : IExec
 		GitOps.TagCreate(sln.Folder, sln.Version, dc);
 	});
 
-	public void ReleasePrjLocally(Prj prj) =>
+	public void ReleasePrjLocally(Prj prj) => Wrap(() =>
+	{
 		NugetCLI.Release(prj.File, false, "", dc);
+	});
 
 	void Wrap(Action action)
 	{
@@ -70,6 +73,20 @@ sealed class Exec(DumpContainer dc, string nugetApiKey) : IExec
 		catch (Exception ex)
 		{
 			dc.AppendContent(ex);
+		}
+	}
+
+	T Wrap<T>(T def, Func<T> action)
+	{
+		try
+		{
+			dc.ClearContent();
+			return action();
+		}
+		catch (Exception ex)
+		{
+			dc.AppendContent(ex);
+			return def;
 		}
 	}
 }

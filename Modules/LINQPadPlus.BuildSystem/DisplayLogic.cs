@@ -62,21 +62,27 @@ static class DisplayLogic
 	public static void InitCss() =>
 		Util.HtmlHead.AddStyles(
 			"""
-			/* .typeheader { display: none; } */
+			 .noheaders .typeheader { display: none; }
 			""");
 
-	public static object Display(this Sln sln, IRwVar<string> ΔcommitMsg, IExec exec) => new
-	{
-		sln.Name,
-		Release = sln.IsReleasable(out var reason) switch
-		{
-			false => t.Span[reason!].style($"color:{C.TextRed}"),
-			true => Ctrls.LinkButton("release", () => exec.Release(sln)),
-		},
-		Version = sln.DisplayVersion(ΔcommitMsg, exec),
-		Git = sln.DisplayGitStatus(ΔcommitMsg, exec),
-		Projects = sln.Prjs.Select(prj => prj.Display(exec)),
-	};
+	public static object Display(this Sln sln, IRwVar<string> ΔcommitMsg, IExec exec) =>
+		t.Div.cls("noheaders")[[
+			new DumpContainer(
+				new
+				{
+					sln.Name,
+					Release = sln.IsReleasable(out var reason) switch
+					{
+						false => t.Span[reason!].style($"color:{C.TextRed}"),
+						true => Ctrls.LinkButton("release", () => exec.Release(sln)),
+					},
+					//Release = Ctrls.LinkButton("release", () => exec.Release(sln)),
+					Version = sln.DisplayVersion(ΔcommitMsg, exec),
+					Git = sln.DisplayGitStatus(ΔcommitMsg, exec),
+					Projects = sln.Prjs.Select(prj => prj.Display(exec)),
+				}
+			)
+		]];
 
 	static Tag DisplayVersion(this Sln sln, IRwVar<string> ΔcommitMsg, IExec exec) =>
 		DivHorzSpaced[[

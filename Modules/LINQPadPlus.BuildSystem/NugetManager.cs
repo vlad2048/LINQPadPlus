@@ -47,8 +47,6 @@ public static class NugetManager
 
 		// Display
 		// =======
-
-
 		t.Div.style("display:flex; column-gap:10px")[[
 			Δsln
 				.DistinctUntilChanged(Sln.EqualityComparer)
@@ -56,26 +54,11 @@ public static class NugetManager
 				.Select(e => e.err switch
 				{
 					not null => t.Span[e.err].style("color:#f00"),
-					null => e.sln.Display(ΔcommitMsg, exec)
+					null => e.sln.Display(ΔcommitMsg, exec),
 				})
 				.ToDC(),
 			dcLog,
 		]].Dump();
-
-		/*
-		t.Div.style("display:flex; column-gap:10px")[[
-			t.Div.style("display:flex; flex-direction:column; row-gap:10px")[[
-				t.Div.style("display:flex; column-gap:10px")[[
-					btnRelease,
-				]],
-				Δsln
-					.DistinctUntilChanged(Sln.EqualityComparer)
-					.Select(sln => sln.Display(ΔcommitMsg, exec))
-					.ToDC(),
-			]],
-			dcLog,
-		]].Dump();
-		*/
 	}
 	
 
