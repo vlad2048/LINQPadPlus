@@ -44,7 +44,7 @@ sealed class Exec(DumpContainer dc, string nugetApiKey) : IExec
 	public void Push(Sln sln, string commitMsg) =>
 		GitOps.PushChanges(sln.Folder, commitMsg, dc);
 
-	public void Release(Sln sln)
+	public void Release(Sln sln) => Wrap(() =>
 	{
 		throw new ArgumentException("Ahah");
 		if (!sln.IsReleasable(out var reason))
@@ -53,11 +53,25 @@ sealed class Exec(DumpContainer dc, string nugetApiKey) : IExec
 		{
 			NugetCLI.Release(prj.File, true, nugetApiKey, dc);
 		}
+
 		GitOps.TagCreate(sln.Folder, sln.Version, dc);
-	}
+	});
 
 	public void ReleasePrjLocally(Prj prj) =>
 		NugetCLI.Release(prj.File, false, "", dc);
+
+	void Wrap(Action action)
+	{
+		try
+		{
+			dc.ClearContent();
+			action();
+		}
+		catch (Exception ex)
+		{
+			dc.AppendContent(ex);
+		}
+	}
 }
 
 file static class ExecUtils
