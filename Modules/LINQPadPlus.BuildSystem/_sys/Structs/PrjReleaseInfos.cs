@@ -11,17 +11,13 @@ sealed record PrjReleaseNfo(
 
 sealed record PrjReleaseInfos(
 	IReadOnlyDictionary<string, PrjReleaseNfo> Map
-)
-{
-	[JsonIgnore]
-	public bool NeedsNugetPolling => Map.Values.Any(e => e.Status is PrjStatus.Pending);
-}
+);
 
 
 static class PrjReleaseInfosExt
 {
-	public static string[] Get(this PrjReleaseInfos infos, Func<PrjStatus, bool> pred) =>
-		infos.Map
-			.Where(kv => pred(kv.Value.Status))
-			.SelectA(kv => kv.Key);
+	public static bool NeedsNugetPolling(this PrjReleaseInfos release, SlnFileState file) =>
+		file.Prjs
+			.Where(e => e.IsPackable)
+			.Any(e => release.Map[e.Name].VersionReleased == file.Version.Bump());
 }

@@ -91,7 +91,3 @@ sealed class Exec(DumpContainer dc, string nugetApiKey) : IExec
 	}
 }
 
-file static class ExecUtils
-{
-	public static Version Bump(this Version e) => new(e.Major, e.Minor, e.Build + 1);
-}

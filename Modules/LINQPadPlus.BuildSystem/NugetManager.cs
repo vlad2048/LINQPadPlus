@@ -30,6 +30,7 @@ public static class NugetManager
 	{
 		DisplayLogic.InitCss();
 		var dcLog = new DumpContainer();
+		var dcImportant = new DumpContainer();
 
 		var Δerr = Var.Make<string?>(null).D();
 		var Δfile = Var.Make(await SlnLoader.Load(slnFile, dcLog)).D();
@@ -37,33 +38,35 @@ public static class NugetManager
 		var Δrelease = Var.Expr(() => SlnStateLogic.GetReleaseInfos_From_FileAndNugetState(Δfile.V, Δnuget.V));
 		var Δsln = Var.Expr(() => SlnStateLogic.MakeFinal(Δfile.V, Δnuget.V, Δrelease.V));
 
-		WatchFiles(Δfile, Δerr, slnFile, dcLog).D();
+		WatchFiles(Δfile, Δerr, slnFile, dcLog, dcImportant).D();
 		PollNuget(Δrelease, Δfile, Δnuget).D();
-
-		var btnRelease = new Button("Release");
 
 		var ΔcommitMsg = Var.Make("").D();
 		var exec = new Exec(dcLog, nugetApiKey);
 
 		// Display
 		// =======
-		t.Div.style("display:flex; column-gap:10px")[[
-			Δsln
-				.DistinctUntilChanged(Sln.EqualityComparer)
-				.CombineLatest(Δerr, (sln, err) => (sln, err))
-				.Select(e => e.err switch
-				{
-					not null => t.Span[e.err].style("color:#f00"),
-					null => e.sln.Display(ΔcommitMsg, exec),
-				})
-				.ToDC(),
-			dcLog,
+		t.Div[[
+			dcImportant,
+			t.Div.style("display:flex; column-gap:10px")[[
+				Δsln
+					.DistinctUntilChanged(Sln.EqualityComparer)
+					.CombineLatest(Δerr, (sln, err) => (sln, err))
+					.Select(e => e.err switch
+					{
+						not null => t.Span[e.err].style("color:#f00"),
+						null => e.sln.Display(ΔcommitMsg, exec),
+					})
+					.ToDC(),
+				dcLog,
+			]],
 		]].Dump();
 	}
 	
 
-	static IDisposable WatchFiles(IRwVar<SlnFileState> Δfile, IRwVar<string?> Δerr, string slnFile, DumpContainer dc) =>
+	static IDisposable WatchFiles(IRwVar<SlnFileState> Δfile, IRwVar<string?> Δerr, string slnFile, DumpContainer dc, DumpContainer dcImportant) =>
 		RxFolderWatcher.Watch(Path.GetDirectoryName(slnFile)!)
+			.Where(e => !Δfile.V.IgnoreFolders.Any(e.StartsWith))
 			.Throttle(Consts.FileDebouncePeriod)
 			.Select(_ => Obs.FromAsync(async () => await SlnLoader.Load(slnFile, dc))
 				.Retry(4)
@@ -81,6 +84,7 @@ public static class NugetManager
 							break;
 						case NotificationKind.OnError:
 							Δerr.V = e.Exception!.Message;
+							dcImportant.AppendContent(e.Exception!.Message);
 							break;
 					}
 				}
@@ -93,7 +97,8 @@ public static class NugetManager
 		IRwVar<SlnNugetState> Δnuget
 	) =>
 		Δrelease
-			.Select(e => e.NeedsNugetPolling)
+			.CombineLatest(Δfile, (release, file) => (release, file))
+			.Select(e => e.release.NeedsNugetPolling(e.file))
 			.DistinctUntilChanged()
 			.Select(e => e switch
 			{
