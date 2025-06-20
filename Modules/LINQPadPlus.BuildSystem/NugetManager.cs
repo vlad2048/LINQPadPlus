@@ -19,12 +19,13 @@ public static class NugetManager
 		DisplayLogic.InitCss();
 		var dcLog = new DumpContainer();
 
+		var Δerr = Var.Make<string?>(null).D();
 		var Δfile = Var.Make(await SlnLoader.Load(slnFile, dcLog)).D();
 		var Δnuget = Var.Make(NugetAPI.GetState(Δfile.V)).D();
 		var Δrelease = Var.Expr(() => SlnStateLogic.GetReleaseInfos_From_FileAndNugetState(Δfile.V, Δnuget.V));
 		var Δsln = Var.Expr(() => SlnStateLogic.MakeFinal(Δfile.V, Δnuget.V, Δrelease.V));
 
-		WatchFiles(Δfile, slnFile, dcLog).D();
+		WatchFiles(Δfile, Δerr, slnFile, dcLog).D();
 		PollNuget(Δrelease, Δfile, Δnuget).D();
 
 		var btnRelease = new Button("Release");
@@ -34,6 +35,22 @@ public static class NugetManager
 
 		// Display
 		// =======
+
+
+		t.Div.style("display:flex; column-gap:10px")[[
+			Δsln
+				.DistinctUntilChanged(Sln.EqualityComparer)
+				.CombineLatest(Δerr, (sln, err) => (sln, err))
+				.Select(e => e.err switch
+				{
+					not null => t.Span[e.err].style("color:#f00"),
+					null => e.sln.Display(ΔcommitMsg, exec)
+				})
+				.ToDC(),
+			dcLog,
+		]].Dump();
+
+		/*
 		t.Div.style("display:flex; column-gap:10px")[[
 			t.Div.style("display:flex; flex-direction:column; row-gap:10px")[[
 				t.Div.style("display:flex; column-gap:10px")[[
@@ -46,15 +63,33 @@ public static class NugetManager
 			]],
 			dcLog,
 		]].Dump();
+		*/
 	}
 	
 
-	static IDisposable WatchFiles(IRwVar<SlnFileState> Δfile, string slnFile, DumpContainer dc) =>
+	static IDisposable WatchFiles(IRwVar<SlnFileState> Δfile, IRwVar<string?> Δerr, string slnFile, DumpContainer dc) =>
 		RxFolderWatcher.Watch(Path.GetDirectoryName(slnFile)!)
 			.Throttle(Consts.FileDebouncePeriod)
-			.Select(_ => Obs.FromAsync(async () => await SlnLoader.Load(slnFile, dc)).Retry())
+			.Select(_ => Obs.FromAsync(async () => await SlnLoader.Load(slnFile, dc))
+				.Retry(4)
+				.Materialize()
+			)
 			.Switch()
-			.Subscribe(e => Δfile.V = e, err => dc.Log($"Δfile Error caught: {err.Message}"));
+			.Subscribe(
+				e =>
+				{
+					switch (e.Kind)
+					{
+						case NotificationKind.OnNext:
+							Δerr.V = null;
+							Δfile.V = e.Value;
+							break;
+						case NotificationKind.OnError:
+							Δerr.V = e.Exception!.Message;
+							break;
+					}
+				}
+			);
 	
 	
 	static IDisposable PollNuget(

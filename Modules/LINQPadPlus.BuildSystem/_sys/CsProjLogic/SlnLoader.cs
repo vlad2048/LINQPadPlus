@@ -12,7 +12,7 @@ namespace LINQPadPlus.BuildSystem._sys.CsProjLogic;
 
 static class SlnLoader
 {
-	public static async Task<SlnFileState> Load(string slnFile, DumpContainer dc)
+	/*public static async Task<SlnFileState> Load(string slnFile, DumpContainer dc)
 	{
 		try
 		{
@@ -23,9 +23,9 @@ static class SlnLoader
 			dc.Log($"File error: [{ex.GetType().FullName}] {ex.Message}");
 			throw;
 		}
-	}
+	}*/
 	
-	static async Task<SlnFileState> LoadInternal(string slnFile, DumpContainer dc) => new(
+	public static async Task<SlnFileState> Load(string slnFile, DumpContainer dc) => new(
 
 		slnFile,
 

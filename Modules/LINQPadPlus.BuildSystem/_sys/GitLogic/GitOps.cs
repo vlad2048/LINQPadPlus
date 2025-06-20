@@ -60,7 +60,7 @@ static class GitOps
 	}
 
 	public static GitStatus GetStatus(string folder, DumpContainer dc) =>
-		Cmd.RunAndParse("git", folder, ["status"], ParseStatus, dc);
+		Cmd.RunAndParse("git", folder, ["status"], ParseStatus, null);
 
 	public static Version[] TagList(string folder, DumpContainer dc) =>
 		Cmd.RunAndParse("git", folder, ["tag"], ParseVersions, dc);

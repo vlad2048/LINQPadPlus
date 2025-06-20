@@ -1,5 +1,4 @@
 ﻿using LINQPad;
-using LINQPad.FSharpExtensions;
 using LINQPadPlus.BuildSystem._sys.CsProjLogic;
 using LINQPadPlus.BuildSystem._sys.GitLogic;
 using LINQPadPlus.BuildSystem._sys.NugetLogic;

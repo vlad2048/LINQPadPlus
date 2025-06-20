@@ -72,7 +72,7 @@ static class TableLogic
 						formatter = column.Fmt_,
 						visible = !column.Hide_,
 						headerTooltip = opts.HeaderTooltip,
-						tooltip = opts.HeaderTooltip,
+						tooltip = opts.CellTooltip,
 					}
 				)
 				.Concat(opts.SearchFields.Select((_, searchFieldIdx) =>
