@@ -15,7 +15,7 @@ static class DisplayLogicTester
 			new Version(0, 0, 10),
 			[
 				new Prj("LINQPadPlus", false, [], [], PrjStatus.NotPackable, null, null),
-				new Prj("LINQPadPlus.Plotly", true, [], [], PrjStatus.Never, null, null),
+				new Prj("LINQPadPlus.Plotly", true, [], [], PrjStatus.Ready, null, null),
 				new Prj("LINQPadPlus.Tabulator", true, [], [], PrjStatus.Ready, new Version(0, 0, 9), null),
 				new Prj("LINQPadPlus.BuildSystem", true, [], [], PrjStatus.Pending, new Version(0, 0, 9), new Version(0, 0, 10)),
 				new Prj("LINQPadPlus.Other", true, [], [], PrjStatus.UptoDate, new Version(0, 0, 10), null),
@@ -174,7 +174,7 @@ file static class C
 	public static readonly Dictionary<PrjStatus, string> StatusText = new()
 	{
 		{ PrjStatus.NotPackable,    "Not packable" },
-		{ PrjStatus.Never,          "Never released" },
+		//{ PrjStatus.Never,          "Never released" },
 		{ PrjStatus.Ready,          "Ready for release" },
 		{ PrjStatus.Pending,        "Release pending" },
 		{ PrjStatus.UptoDate,       "Upto date" },
@@ -183,7 +183,7 @@ file static class C
 	public static readonly Dictionary<PrjStatus, string> StatusColors = new()
 	{
 		{ PrjStatus.NotPackable,    "#818181" },
-		{ PrjStatus.Never,          "#ebebeb" },
+		//{ PrjStatus.Never,          "#ebebeb" },
 		{ PrjStatus.Ready,          "#2bccff" },
 		{ PrjStatus.Pending,        "#fd7d2f" },
 		{ PrjStatus.UptoDate,       "#36dd68" },

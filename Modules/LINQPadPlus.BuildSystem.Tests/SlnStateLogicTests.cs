@@ -34,7 +34,7 @@ class SlnStateLogicTests
 		)
 		.Check([
 			Res(A, PrjStatus.NotPackable),
-			Res(B, PrjStatus.Never),
+			Res(B, PrjStatus.Ready),
 			Res(C, PrjStatus.Ready, v1),
 			Res(D, PrjStatus.Pending, v1, v2),
 			Res(E, PrjStatus.UptoDate, v2),

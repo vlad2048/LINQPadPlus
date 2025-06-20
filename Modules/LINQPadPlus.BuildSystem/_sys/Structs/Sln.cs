@@ -26,10 +26,10 @@ public enum PrjStatus
 	/// </summary>
 	NotPackable,
 	
-	/// <summary>
-	/// Has never been released to nuget yet
-	/// </summary>
-	Never,
+	// <summary>
+	// Has never been released to nuget yet
+	// </summary>
+	//Never,
 
 	/// <summary>
 	/// Nuget.Version &lt; Sln.Version
@@ -101,11 +101,18 @@ static class SlnUtils
 			reason = "No packable projects";
 			return false;
 		}
-
-		var prjsNotReady = prjs.WhereA(e => e.Status != PrjStatus.Ready && e.Status != PrjStatus.Never);
-		if (prjsNotReady.Length > 0)
+		
+		var prjsIssues = prjs.WhereA(e => e.Status is PrjStatus.ERROR);
+		if (prjsIssues.Length > 0)
 		{
-			reason = $"Projects not ready (or never released): {string.Join(", ", prjsNotReady.Select(e => e.Name))}";
+			reason = $"Projects with errors: {string.Join(", ", prjsIssues.Select(e => e.Name))}";
+			return false;
+		}
+
+		var prjsReleasable = prjs.WhereA(e => e.Status is PrjStatus.Ready);
+		if (prjsReleasable.Length == 0)
+		{
+			reason = "No projects are Ready";
 			return false;
 		}
 

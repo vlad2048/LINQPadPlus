@@ -16,6 +16,18 @@ public static class NugetManager
 {
 	public static async Task Run(string slnFile, string nugetApiKey)
 	{
+		try
+		{
+			await RunInternal(slnFile, nugetApiKey);
+		}
+		catch (Exception ex)
+		{
+			ex.Dump();
+		}
+	}
+	
+	static async Task RunInternal(string slnFile, string nugetApiKey)
+	{
 		DisplayLogic.InitCss();
 		var dcLog = new DumpContainer();
 

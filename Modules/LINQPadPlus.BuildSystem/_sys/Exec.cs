@@ -46,9 +46,10 @@ sealed class Exec(DumpContainer dc, string nugetApiKey) : IExec
 
 	public void Release(Sln sln)
 	{
+		throw new ArgumentException("Ahah");
 		if (!sln.IsReleasable(out var reason))
 			throw new ArgumentException($"Impossible. Solution is not releasable: {reason}");
-		foreach (var prj in sln.Prjs.WhereA(e => e.IsPackable))
+		foreach (var prj in sln.Prjs.WhereA(e => e.Status is PrjStatus.Ready))
 		{
 			NugetCLI.Release(prj.File, true, nugetApiKey, dc);
 		}

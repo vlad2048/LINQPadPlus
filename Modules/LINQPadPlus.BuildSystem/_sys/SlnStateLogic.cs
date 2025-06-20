@@ -79,7 +79,7 @@ static class SlnStateLogic
 
 		var results =
 			GetNfo(xsNotPackable, PrjStatus.NotPackable)
-				.Concat(GetNfo(xsNever, PrjStatus.Never))
+				.Concat(GetNfo(xsNever, PrjStatus.Ready))
 				.Concat(GetNfo(xsReady, PrjStatus.Ready))
 				.Concat(GetNfo(xsPending, PrjStatus.Pending))
 				.Concat(GetNfo(xsUptodate, PrjStatus.UptoDate))
