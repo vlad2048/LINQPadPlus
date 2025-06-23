@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using LINQPadPlus.BuildSystem._sys.Utils;
+using C = LINQPadPlus.BuildSystem.DisplayConsts;
 
 namespace LINQPadPlus.BuildSystem._sys.Structs;
 
@@ -25,11 +26,6 @@ public enum PrjStatus
 	/// IsPackable=False
 	/// </summary>
 	NotPackable,
-	
-	// <summary>
-	// Has never been released to nuget yet
-	// </summary>
-	//Never,
 
 	/// <summary>
 	/// Nuget.Version &lt; Sln.Version
@@ -84,10 +80,42 @@ sealed record Prj(
 
 
 
+sealed record ReleaseIssue(
+	string Text,
+	bool IsGood
+);
+
 
 static class SlnUtils
 {
-	public static bool IsReleasable(this Sln sln, out string? reason)
+	public static Maybe<ReleaseIssue> GetReleaseIssue(this Sln sln)
+	{
+		Maybe<ReleaseIssue> ErrBad(string text) => May.Some(new ReleaseIssue(text, false));
+		Maybe<ReleaseIssue> ErrGood(string text) => May.Some(new ReleaseIssue(text, true));
+
+		if (sln.GitStatus is not GitStatus.Clean) return ErrBad("Git needs to be clean");
+
+		var prjs = sln.Prjs.WhereA(e => e.IsPackable);
+		if (prjs.Length == 0) return ErrBad("No packable projects");
+
+		if (prjs.Any(PrjStatus.ERROR)) return ErrBad("Projects with errors");
+		if (prjs.Any(PrjStatus.Pending)) return ErrBad("Pending projects");
+		if (!prjs.Any(PrjStatus.Ready))
+		{
+			if (prjs.Count(e => e.Status is PrjStatus.UptoDate) > 0)
+				return ErrGood("All projects are up to date");
+			else
+				return ErrBad("No projects are ready");
+		}
+
+		return May.None<ReleaseIssue>();
+	}
+	
+	static bool Any(this Prj[] prjs, PrjStatus status) => prjs.Any(e => e.Status == status);
+
+	
+	/*
+	public static bool IsReleasable(this Sln sln, [NotNullWhen(false)] out string? reason)
 	{
 		if (sln.GitStatus is not GitStatus.Clean)
 		{
@@ -119,6 +147,7 @@ static class SlnUtils
 		reason = null;
 		return true;
 	}
+	*/
 }
 
 

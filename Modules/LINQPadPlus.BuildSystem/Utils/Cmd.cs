@@ -61,5 +61,26 @@ public static class Cmd
 		}
 	}
 
-	static string[] SplitInLines(this string str) => str.Split(Environment.NewLine);
+	public static string[] SplitInLines(this string str)
+	{
+		var hasCR = str.Contains('\r');
+		var hasLF = str.Contains('\n');
+		return (hasCR, hasLF) switch
+		{
+			(false, false) => [str],
+			(true, false) => str.Chop('\r'),
+			(false, true) => str.Chop('\n'),
+			(true, true) => str.SplitInLinesWindows(),
+		};
+	}
+
+	static string[] SplitInLinesWindows(this string str)
+	{
+		var xs = str.Chop("\r\n");
+		if (xs.Any(x => x.Contains('\r') || x.Contains('\n'))) throw new ArgumentException($"Inconsistent line endings in '{str}'");
+		return xs;
+	}
+
+	static string[] Chop(this string str, char sep) => str.Split(sep, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+	static string[] Chop(this string str, string sep) => str.Split(sep, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 }

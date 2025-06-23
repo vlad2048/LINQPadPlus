@@ -1,5 +1,6 @@
 ﻿using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using LINQPad;
 using LINQPad.Controls;
 using LINQPadPlus.BuildSystem._sys;
@@ -14,11 +15,11 @@ namespace LINQPadPlus.BuildSystem;
 
 public static class NugetManager
 {
-	public static async Task Run(string slnFile, string nugetApiKey)
+	public static async Task Run(string slnFile, string nugetUrl, string nugetKey)
 	{
 		try
 		{
-			await RunInternal(slnFile, nugetApiKey);
+			await RunInternal(slnFile, nugetUrl, nugetKey);
 		}
 		catch (Exception ex)
 		{
@@ -26,23 +27,24 @@ public static class NugetManager
 		}
 	}
 	
-	static async Task RunInternal(string slnFile, string nugetApiKey)
+	static async Task RunInternal(string slnFile, string nugetUrl, string nugetKey)
 	{
 		DisplayLogic.InitCss();
 		var dcLog = new DumpContainer();
 		var dcImportant = new DumpContainer();
 
+		var ΔwhenRefresh = new Subject<Unit>().D();
 		var Δerr = Var.Make<string?>(null).D();
 		var Δfile = Var.Make(await SlnLoader.Load(slnFile, dcLog)).D();
-		var Δnuget = Var.Make(NugetAPI.GetState(Δfile.V)).D();
+		var Δnuget = Var.Make(NugetAPI.GetState(Δfile.V, nugetUrl)).D();
 		var Δrelease = Var.Expr(() => SlnStateLogic.GetReleaseInfos_From_FileAndNugetState(Δfile.V, Δnuget.V));
 		var Δsln = Var.Expr(() => SlnStateLogic.MakeFinal(Δfile.V, Δnuget.V, Δrelease.V));
 
-		WatchFiles(Δfile, Δerr, slnFile, dcLog, dcImportant).D();
-		PollNuget(Δrelease, Δfile, Δnuget).D();
+		WatchFiles(Δfile, Δerr, ΔwhenRefresh, slnFile, dcLog, dcImportant).D();
+		PollNuget(Δfile, Δnuget, ΔwhenRefresh, nugetUrl).D();
 
 		var ΔcommitMsg = Var.Make("").D();
-		var exec = new Exec(dcLog, nugetApiKey);
+		var exec = new Exec(dcLog, nugetUrl, nugetKey, () => ΔwhenRefresh.OnNext(Unit.Default));
 
 		// Display
 		// =======
@@ -64,10 +66,19 @@ public static class NugetManager
 	}
 	
 
-	static IDisposable WatchFiles(IRwVar<SlnFileState> Δfile, IRwVar<string?> Δerr, string slnFile, DumpContainer dc, DumpContainer dcImportant) =>
+	static IDisposable WatchFiles(
+		IRwVar<SlnFileState> Δfile,
+		IRwVar<string?> Δerr,
+		IObservable<Unit> ΔwhenRefresh,
+		string slnFile,
+		DumpContainer dc,
+		DumpContainer dcImportant
+	) =>
 		RxFolderWatcher.Watch(Path.GetDirectoryName(slnFile)!)
 			.Where(e => !Δfile.V.IgnoreFolders.Any(e.StartsWith))
 			.Throttle(Consts.FileDebouncePeriod)
+			.ToUnit()
+			.Merge(ΔwhenRefresh)
 			.Select(_ => Obs.FromAsync(async () => await SlnLoader.Load(slnFile, dc))
 				.Retry(4)
 				.Materialize()
@@ -89,23 +100,32 @@ public static class NugetManager
 					}
 				}
 			);
-	
-	
+
+
 	static IDisposable PollNuget(
-		IRoVar<PrjReleaseInfos> Δrelease,
 		IRoVar<SlnFileState> Δfile,
-		IRwVar<SlnNugetState> Δnuget
+		IRwVar<SlnNugetState> Δnuget,
+		IObservable<Unit> ΔwhenRefresh,
+		string nugetUrl
 	) =>
-		Δrelease
-			.CombineLatest(Δfile, (release, file) => (release, file))
-			.Select(e => e.release.NeedsNugetPolling(e.file))
-			.DistinctUntilChanged()
-			.Select(e => e switch
-			{
-				false => Obs.Never<Unit>(),
-				true => Obs.Interval(Consts.NugetDebouncePeriod).ToUnit().Prepend(Unit.Default),
-			})
-			.Switch()
+		Obs.Merge(
+				Obs.Interval(Consts.NugetDebouncePeriod).ToUnit().Prepend(Unit.Default),
+				ΔwhenRefresh
+			)
 			.WithLatestFrom(Δfile, (_, file) => file)
-			.Subscribe(file => Δnuget.V = NugetAPI.GetState(file));
+			.Subscribe(file => Δnuget.V = NugetAPI.GetState(file, nugetUrl));
+	
+	/*Δrelease
+		.CombineLatest(Δfile, ΔwhenRefresh, (release, file, _) => (release, file))
+		.Select(e => e.release.NeedsNugetPolling(e.file))
+		.DistinctUntilChanged()
+		.Select(e => e switch
+		{
+			false => Obs.Never<Unit>(),
+			true => Obs.Interval(Consts.NugetDebouncePeriod).ToUnit().Prepend(Unit.Default),
+		})
+		.Switch()
+		.CombineLatest(ΔwhenRefresh, (e, _) => e)
+		.WithLatestFrom(Δfile, (_, file) => file)
+		.Subscribe(file => Δnuget.V = NugetAPI.GetState(file, nugetUrl));*/
 }

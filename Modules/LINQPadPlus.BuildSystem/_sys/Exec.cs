@@ -9,6 +9,7 @@ namespace LINQPadPlus.BuildSystem._sys;
 
 interface IExec
 {
+	void Refresh();
 	Version BumpVersion(Sln sln);
 	void Push(Sln sln, string commitMsg);
 	void Release(Sln sln);
@@ -17,6 +18,7 @@ interface IExec
 
 sealed class TestExec : IExec
 {
+	public void Refresh() {}
 	public Version BumpVersion(Sln sln) => sln.Version.Bump();
 	public void Push(Sln sln, string commitMsg)
 	{
@@ -29,8 +31,10 @@ sealed class TestExec : IExec
 	}
 }
 
-sealed class Exec(DumpContainer dc, string nugetApiKey) : IExec
+sealed class Exec(DumpContainer dc, string nugetUrl, string nugetKey, Action refresh) : IExec
 {
+	public void Refresh() => refresh();
+
 	public Version BumpVersion(Sln sln) => Wrap(sln.Version, () =>
 	{
 		var versionBump = sln.Version.Bump();
@@ -44,23 +48,26 @@ sealed class Exec(DumpContainer dc, string nugetApiKey) : IExec
 	public void Push(Sln sln, string commitMsg) => Wrap(() =>
 	{
 		GitOps.PushChanges(sln.Folder, commitMsg, dc);
+		refresh();
 	});
 
 	public void Release(Sln sln) => Wrap(() =>
 	{
-		if (!sln.IsReleasable(out var reason))
-			throw new ArgumentException($"Impossible. Solution is not releasable: {reason}");
+		if (sln.GetReleaseIssue().IsSome(out var issue))
+			throw new ArgumentException($"Impossible. Solution is not releasable: {issue.Text}");
 		foreach (var prj in sln.Prjs.WhereA(e => e.Status is PrjStatus.Ready))
 		{
-			NugetCLI.Release(prj.File, true, nugetApiKey, dc);
+			NugetCLI.Release(prj.File, true, nugetUrl, nugetKey, dc);
 		}
 
 		GitOps.TagCreate(sln.Folder, sln.Version, dc);
+
+		refresh();
 	});
 
 	public void ReleasePrjLocally(Prj prj) => Wrap(() =>
 	{
-		NugetCLI.Release(prj.File, false, "", dc);
+		NugetCLI.Release(prj.File, false, nugetUrl, "", dc);
 	});
 
 	void Wrap(Action action)

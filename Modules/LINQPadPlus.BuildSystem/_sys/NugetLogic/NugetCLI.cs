@@ -10,7 +10,7 @@ static class NugetCLI
 	public static string GlobalPackagesFolder => globalPackagesFolder.Value;
 	
 
-	public static void Release(string prjFile, bool remote, string apiKey, DumpContainer dc)
+	public static void Release(string prjFile, bool remote, string nugetUrl, string nugetKey, DumpContainer dc)
 	{
 		var folder = Path.GetDirectoryName(prjFile)!;
 		var folderRelease = Path.Combine(folder, "bin", "Release");
@@ -27,8 +27,8 @@ static class NugetCLI
 
 		if (remote)
 		{
-			Cmd.Run("nuget", folder, ["setapikey", apiKey, "-source", Consts.NugetUrl], dc);
-			Cmd.Run("nuget", folder, ["push", pkgFileRel, "-source", Consts.NugetUrl], dc);
+			Cmd.Run("nuget", folder, ["setapikey", nugetKey, "-source", nugetUrl], dc);
+			Cmd.Run("nuget", folder, ["push", pkgFileRel, "-source", nugetUrl], dc);
 			NugetAPI.CacheUpdate(Path.GetFileNameWithoutExtension(prjFile), version);
 		}
 

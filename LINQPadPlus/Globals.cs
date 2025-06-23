@@ -1,5 +1,7 @@
 ﻿global using Obs = System.Reactive.Linq.Observable;
 using System.Reactive.Disposables;
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("LINQPadQuery")]
 
 namespace LINQPadPlus;
 

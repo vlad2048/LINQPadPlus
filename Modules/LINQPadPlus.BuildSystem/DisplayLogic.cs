@@ -2,7 +2,9 @@
 using LINQPad;
 using LINQPadPlus.BuildSystem._sys;
 using LINQPadPlus.BuildSystem._sys.Structs;
+using LINQPadPlus.BuildSystem._sys.Utils;
 using LINQPadPlus.Rx;
+using C = LINQPadPlus.BuildSystem.DisplayConsts;
 
 namespace LINQPadPlus.BuildSystem;
 
@@ -65,16 +67,17 @@ static class DisplayLogic
 			 .noheaders .typeheader { display: none; }
 			""");
 
-	public static object Display(this Sln sln, IRwVar<string> ΔcommitMsg, IExec exec) =>
+	public static Tag Display(this Sln sln, IRwVar<string> ΔcommitMsg, IExec exec) =>
 		t.Div.cls("noheaders")[[
 			new DumpContainer(
 				new
 				{
 					sln.Name,
-					Release = sln.IsReleasable(out var reason) switch
+					Refresh = Ctrls.LinkButton("refresh", exec.Refresh),
+					Release = sln.GetReleaseIssue().IsSome(out var issue) switch
 					{
-						false => t.Span[reason!].style($"color:{C.TextRed}"),
-						true => Ctrls.LinkButton("release", () => exec.Release(sln)),
+						true => issue.fmt(),
+						false => Ctrls.LinkButton("release", () => exec.Release(sln)),
 					},
 					//Release = Ctrls.LinkButton("release", () => exec.Release(sln)),
 					Version = sln.DisplayVersion(ΔcommitMsg, exec),
@@ -83,6 +86,10 @@ static class DisplayLogic
 				}
 			)
 		]];
+	
+	static Tag fmt(this ReleaseIssue issue) =>
+		t.Span[issue.Text]
+			.style($"color:{(issue.IsGood ? C.TextGreen : C.TextRed)}");
 
 	static Tag DisplayVersion(this Sln sln, IRwVar<string> ΔcommitMsg, IExec exec) =>
 		DivHorzSpaced[[
@@ -167,32 +174,4 @@ static class DisplayLogic
 }
 
 
-
-
-file static class C
-{
-	public const string TextRed = "#f15858";
-	public const string TextGreen = "#4beb52";
-
-	// @formatter:off
-	public static readonly Dictionary<PrjStatus, string> StatusText = new()
-	{
-		{ PrjStatus.NotPackable,    "Not packable" },
-		//{ PrjStatus.Never,          "Never released" },
-		{ PrjStatus.Ready,          "Ready for release" },
-		{ PrjStatus.Pending,        "Release pending" },
-		{ PrjStatus.UptoDate,       "Upto date" },
-		{ PrjStatus.ERROR,          "ERROR" },
-	};
-	public static readonly Dictionary<PrjStatus, string> StatusColors = new()
-	{
-		{ PrjStatus.NotPackable,    "#818181" },
-		//{ PrjStatus.Never,          "#ebebeb" },
-		{ PrjStatus.Ready,          "#2bccff" },
-		{ PrjStatus.Pending,        "#fd7d2f" },
-		{ PrjStatus.UptoDate,       "#36dd68" },
-		{ PrjStatus.ERROR,          "#f53e1e" },
-	};
-	// @formatter:on
-}
 

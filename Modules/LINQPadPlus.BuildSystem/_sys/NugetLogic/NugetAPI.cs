@@ -9,8 +9,8 @@ namespace LINQPadPlus.BuildSystem._sys.NugetLogic;
 // https://learn.microsoft.com/en-us/nuget/api/search-query-service-resource
 static class NugetAPI
 {
-	public static SlnNugetState GetState(SlnFileState sln) => new(
-		GetReleasedVersions(sln),
+	public static SlnNugetState GetState(SlnFileState sln, string nugetUrl) => new(
+		GetReleasedVersions(sln, nugetUrl),
 		GetPendingVersions(sln)
 	);
 
@@ -20,20 +20,24 @@ static class NugetAPI
 
 
 
-	static IReadOnlyDictionary<string, Version> GetReleasedVersions(SlnFileState sln) =>
-		(
-			from prj in sln.Prjs
-			where prj.IsPackable
-			from item in Search(SearchUrl, prj.Name).Data
-			let maxVersion = item.Versions.Select(e => e.Version).Max()
-			select new
-			{
-				Name = item.Id,
-				Version = maxVersion,
-			}
-		)
-		.Distinct()
-		.ToDictionary(e => e.Name, e => e.Version);
+	static IReadOnlyDictionary<string, Version> GetReleasedVersions(SlnFileState sln, string nugetUrl)
+	{
+		searchUrl ??= GetIndex(nugetUrl).Resources.First(e => e.Type == "SearchQueryService").Id;
+		return
+			(
+				from prj in sln.Prjs
+				where prj.IsPackable
+				from item in Search(searchUrl, prj.Name, nugetUrl).Data
+				let maxVersion = item.Versions.Select(e => e.Version).Max()
+				select new
+				{
+					Name = item.Id,
+					Version = maxVersion,
+				}
+			)
+			.Distinct()
+			.ToDictionary(e => e.Name, e => e.Version);
+	}
 
 	static IReadOnlyDictionary<string, Version> GetPendingVersions(SlnFileState sln) =>
 		(
@@ -54,30 +58,27 @@ static class NugetAPI
 
 
 	static readonly HttpClient client = new();
-	static readonly Lazy<string> searchUrl = new(() => GetIndex().Resources.First(e => e.Type == "SearchQueryService").Id);
-	static string SearchUrl => searchUrl.Value;
+	static string? searchUrl;
 	static readonly Dictionary<string, Version> cache = [];
 	
 
 
-	static NugetIndex GetIndex() =>
+	static NugetIndex GetIndex(string nugetUrl) =>
 		Get<NugetIndex>(
-			Consts.NugetUrl,
+			nugetUrl,
 			b => b
 		);
 	
-	static NugetSearchQueryService Search(string url, string search) =>
-		Get<NugetSearchQueryService>(
+	public static NugetSearchQueryService Search(string url, string search, string nugetUrl)
+	{
+		searchUrl ??= GetIndex(nugetUrl).Resources.First(e => e.Type == "SearchQueryService").Id;
+		return Get<NugetSearchQueryService>(
 			url,
 			b => b
 				.Set("q", search)
 				.Set("prerelease", false) // setting it to true does not include pending packages
 		);
-
-
-
-
-
+	}
 
 
 	sealed record NugetIndex(
@@ -94,7 +95,7 @@ static class NugetAPI
 
 
 
-	sealed record NugetSearchQueryService(
+	public sealed record NugetSearchQueryService(
 		int TotalHits,
 		NugetSearchQueryService.Item[] Data
 	)
