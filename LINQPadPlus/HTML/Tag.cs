@@ -7,6 +7,7 @@ using LINQPadPlus._sys.Utils;
 using LINQPadPlus.Rx;
 using JetBrains.Annotations;
 using System.Runtime.CompilerServices;
+using LINQPad.Controls;
 using LINQPadPlus._sys.TagUtils;
 
 namespace LINQPadPlus;
@@ -99,8 +100,43 @@ public class Tag
 	// ReSharper disable ExplicitCallerInfoArgument
 		this.With(() => whenPostRender.Subscribe(_ => this.Run(onRender, null, srcMember, srcFile, srcLine)));
 	// ReSharper restore ExplicitCallerInfoArgument
-	
-	
+
+	public Tag On(string evtName, string[] evtProps, Action<IDictionary<string, string>> action) =>
+		this.With(() =>
+			whenPostRender.Subscribe(_ =>
+			{
+				var ctrl = new Control(name)
+				{
+					HtmlElement =
+					{
+						ID = Id,
+					},
+					CssClass = JSRunIdentifiers.ClassToRemove,
+				};
+				ctrl.HtmlElement.AddEventListener(evtName, evtProps, (_, args) => action(args.Properties));
+				ctrl.Styles["display"] = "none";
+				ctrl.Dump();
+			})
+		);
+
+	public Tag On(string evtName, Action action) =>
+		this.With(() =>
+			whenPostRender.Subscribe(_ =>
+			{
+				var ctrl = new Control(name)
+				{
+					HtmlElement =
+					{
+						ID = Id,
+					},
+					CssClass = JSRunIdentifiers.ClassToRemove,
+				};
+				ctrl.HtmlElement.AddEventListener(evtName, (_, _) => action());
+				ctrl.Styles["display"] = "none";
+				ctrl.Dump();
+			})
+		);
+
 	public Tag on<T>(IRoVar<T> Δrx, Func<Tag, T, Tag> preRender, string postRender) =>
 		this.With(() =>
 		{

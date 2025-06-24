@@ -99,11 +99,30 @@ public static partial class JS
 				function stop() { clearInterval(intervalId); }
 				timerIds.push(intervalId);
 			}
+			
+			
+			
+			
+			// ************************************************
+			// * Remove all elements with class=ClassToRemove *
+			// ************************************************
+			new MutationObserver((muts, obs) => {
+				muts.filter(e => e.type === 'childList')
+					.flatMap(e => [...e.addedNodes])
+					.filter(e => e instanceof HTMLElement && (e.classList.contains(____2____)|| [...e.children].some(f => f.classList.contains(____2____))))
+					.forEach(del => {
+						console.log('EVT');
+						del.remove();
+					});
+			}).observe(document.body, { childList: true, subtree: true });
+			
+			
 
 			""",
 			e => e
 				.JSRepl_Val(0, Events.ErrorDispatcherId)
 				.JSRepl_Val(1, JSRunIdentifiers.RuntimeErrorIdentifier)
+				.JSRepl_Val(2, JSRunIdentifiers.ClassToRemove)
 		));
 	}
 }
